@@ -1,0 +1,7 @@
+; $Id$
+name = Node Reference
+description = Defines a field type for referencing one node from another.
+files[] = node_reference.module
+package = References
+core = 7.x
+php = 5.1
