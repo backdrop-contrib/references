@@ -74,8 +74,8 @@ function node_reference_field_settings_form($field, $instance, $has_data) {
     '#title'         => t('Content types that can be referenced'),
     '#multiple'      => TRUE,
     '#default_value' => is_array($settings['referenceable_types'])
-       ? $settings['referenceable_types']
-       : array(),
+      ? $settings['referenceable_types']
+      : array(),
     '#options'       => array_map('check_plain', node_type_get_names()),
     '#disabled'      => $has_data,
   );
@@ -102,7 +102,7 @@ function node_reference_field_validate($entity_type, $entity, $field, $instance,
         $errors[$field['field_name']][$langcode][$delta][] = array(
           'error' => 'invalid_nid',
           'message' => t("%name: invalid input.",
-             array('%name' => $instance['label'])),
+            array('%name' => $instance['label'])),
         );
       }
     }
@@ -175,7 +175,7 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
  * Implements hook_field_is_empty().
  */
 function node_reference_field_is_empty($item, $field) {
-  // nid = 0 îs empty too, which is exactly what we want.
+  // nid = 0 is empty too, which is exactly what we want.
   return empty($item['nid']);
 }
 
@@ -194,17 +194,11 @@ function node_reference_field_formatter_info() {
       'description' => t('Display the title of the referenced node as plain text.'),
       'field types' => array('node_reference'),
     ),
-    // @todo Abstract on 'build mode' (see how image field does with image
-    // styles).
-    'node_reference_full' => array(
-      'label'       => t('Full node'),
-      'description' => t('Display the title of the referenced node as a full node view.'),
+    'node_reference_node' => array(
+      'label'       => t('Rendered node'),
+      'description' => t('Display the referenced node in a specific view mode'),
       'field types' => array('node_reference'),
-    ),
-    'node_reference_teaser' => array(
-      'label'       => t('Teaser'),
-      'description' => t('Display the title of the referenced node as a teaser node view.'),
-      'field types' => array('node_reference'),
+      'settings'    => array('node_reference_view_mode' => 'full'),
     ),
   );
   return $ret;
@@ -212,15 +206,15 @@ function node_reference_field_formatter_info() {
 
 /**
  * Implements hook_field_formatter_prepare_view().
+ *
+ * Preload all nodes referenced by items using 'full entity' formatters.
  */
 function node_reference_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
-  // Preload all nodes referenced by items using 'full entity' formatters.
-
   // Collect nids to load.
-  // @todo : can we make clever use of the recusrion queue here ?
+  // @todo : can we make clever use of the recursion queue here ?
   $nids = array();
   foreach ($displays as $id => $display) {
-    if ($display['type'] == 'node_reference_full' || $display['type'] == 'node_reference_teaser') {
+    if ($display['type'] == 'node_reference_node') {
       foreach ($items[$id] as $delta => $item) {
         if ($item['access']) {
           $nids[$item['nid']] = $item['nid'];
@@ -232,7 +226,7 @@ function node_reference_field_formatter_prepare_view($entity_type, $entities, $f
 
   // Add the loaded nodes to the items.
   foreach ($displays as $id => $display) {
-    if ($display['type'] == 'node_reference_full' || $display['type'] == 'node_reference_teaser') {
+    if ($display['type'] == 'node_reference_node') {
       foreach ($items[$id] as $delta => $item) {
         if ($item['access']) {
           $items[$id][$delta]['node'] = $nodes[$item['nid']];
@@ -240,6 +234,53 @@ function node_reference_field_formatter_prepare_view($entity_type, $entities, $f
       }
     }
   }
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function node_reference_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  // Only build this information for node_reference_node displays
+  if ($display['type'] !== 'node_reference_node') {
+    return NULL;
+  }
+
+  $entity_info = entity_get_info('node');
+  $modes = $entity_info['view modes'];
+  $options = array();
+  foreach ($modes as $name => $mode) {
+    $options[$name] = $mode['label'];
+  }
+  $element['node_reference_view_mode'] = array(
+    '#title'   => t('View mode'),
+    '#type'    => 'select',
+    '#options' => $options,
+    '#default_value' => $settings['node_reference_view_mode'],
+    // Never empty, so no #empty_option
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function node_reference_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  if ($display['type'] === 'node_reference_node') {
+    $entity_info = entity_get_info('node');
+    $modes = $entity_info['view modes'];
+    $mode = $modes[$settings['node_reference_view_mode']]['label'];
+    $summary = t('View mode: %mode', array('%mode' => $mode));
+  }
+  else {
+    $summary = NULL;
+  }
+  return $summary;
 }
 
 /**
@@ -276,13 +317,8 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
       }
       break;
 
-    // @todo Abstract on 'build mode' (see how image field does with image
-    // styles).
-    case 'node_reference_full':
-    case 'node_reference_teaser':
-      // Extract build mode from the formatter name.
-      $view_mode = str_replace('node_reference_', '', $display['type']);
-
+    case 'node_reference_node':
+      $view_mode = $display['settings']['node_reference_view_mode'];
       // To prevent infinite recursion caused by reference cycles, we store
       // diplayed nodes in a recursion queue.
       $recursion_queue = &drupal_static(__FUNCTION__, array());
@@ -742,10 +778,9 @@ function node_reference_options_list($field) {
 /**
  * Implements hook_content_migrate_field_alter().
  *
- * Use this to tweak the conversion of field settings
- * from the D6 style to the D7 style for specific
- * situations not handled by basic conversion,
- * as when field types or settings are changed.
+ * Use this to tweak the conversion of field settings from the D6 style to the
+ * D7 style for specific situations not handled by basic conversion, as when
+ * field types or settings are changed.
  *
  * $field_value['widget_type'] is available to
  * see what widget type was originally used.
@@ -762,10 +797,9 @@ function node_reference_content_migrate_field_alter(&$field_value) {
 /**
  * Implements hook_content_migrate_instance_alter().
  *
- * Use this to tweak the conversion of instance or widget settings
- * from the D6 style to the D7 style for specific
- * situations not handled by basic conversion, as when
- * formatter or widget names or settings are changed.
+ * Use this to tweak the conversion of instance or widget settings from the D6
+ * style to the D7 style for specific situations not handled by basic
+ * conversion, as when formatter or widget names or settings are changed.
  */
 function node_reference_content_migrate_instance_alter(&$instance_value) {
   // The module name for the instance was corrected
@@ -775,7 +809,7 @@ function node_reference_content_migrate_instance_alter(&$instance_value) {
       // The formatter names changed, all are prefixed
       // with 'node_reference_'.
       foreach ($instance_value['display'] as $context => $settings) {
-        $instance_value['display'][$context]['type'] = 'node_reference_'. $settings['type'];
+        $instance_value['display'][$context]['type'] = 'node_reference_' . $settings['type'];
       }
       switch ($instance_value['widget']['type']) {
         case 'nodereference_autocomplete':
