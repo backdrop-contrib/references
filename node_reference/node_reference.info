@@ -1,6 +1,9 @@
 ; $Id$
 name = Node Reference
 description = Defines a field type for referencing one node from another.
-files[]=node_reference.module
 package = Fields
 core = 7.x
+dependencies[] = field
+dependencies[] = options
+files[] = node_reference.module
+

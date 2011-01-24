@@ -1,6 +1,8 @@
 ; $Id$
 name = User Reference
 description = Defines a field type for referencing a user from a node.
-files[]=user_reference.module
 package = Fields
 core = 7.x
+dependencies[] = field
+dependencies[] = options
+files[]=user_reference.module
