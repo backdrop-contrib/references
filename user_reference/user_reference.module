@@ -645,7 +645,7 @@ function user_reference_content_migrate_instance_alter(&$instance_value) {
       // The formatter names changed, all are prefixed
       // with 'user_reference_'.
       foreach ($instance_value['display'] as $context => $settings) {
-        $instance_value['display'][$context]['type'] = 'user_reference_'. $settings['type'];
+        $instance_value['display'][$context]['type'] = 'user_reference_' . $settings['type'];
       }
       switch ($instance_value['widget']['type']) {
         case 'userreference_autocomplete':
