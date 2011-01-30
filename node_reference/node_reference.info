@@ -5,5 +5,3 @@ package = Fields
 core = 7.x
 dependencies[] = field
 dependencies[] = options
-files[] = node_reference.module
-

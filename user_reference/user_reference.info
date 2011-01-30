@@ -5,4 +5,3 @@ package = Fields
 core = 7.x
 dependencies[] = field
 dependencies[] = options
-files[]=user_reference.module
