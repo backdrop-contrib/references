@@ -534,7 +534,7 @@ function user_reference_options_list($field) {
 /**
  * Implementation of hook_user_load().
  */
-/*function user_reference_user_load(&$accounts) {
+/*function user_reference_user_load($accounts) {
 
   // Only add links if we are on the user 'view' page.
   if (arg(0) != 'user' || arg(2)) {
@@ -579,7 +579,7 @@ function user_reference_options_list($field) {
 /**
  * Implementation of hook_user_view().
  */
-/*function user_reference_user_view(&$account) {
+/*function user_reference_user_view($account, $view_mode, $langcode) {
   if (!empty($account->user_reference)) {
     $node_types = content_types();
     $additions = array();
