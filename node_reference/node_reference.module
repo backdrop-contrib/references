@@ -35,6 +35,8 @@ function node_reference_field_info() {
       // 'instance settings' => array('referenceable_types' => array()),
       'default_widget'    => 'options_select', //  node_reference_autocomplete',
       'default_formatter' => 'node_reference_default',
+      // Support hook_entity_property_info() from contrib "Entity API".
+      'property_type' => 'node',
     ),
   );
 }

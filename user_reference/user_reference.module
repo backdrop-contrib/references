@@ -31,6 +31,8 @@ function user_reference_field_info() {
       'settings' => array('referenceable_roles' => array(), 'referenceable_status' => array()),
       'default_widget' => 'user_reference_autocomplete',
       'default_formatter' => 'user_reference_default',
+      // Support hook_entity_property_info() from contrib "Entity API".
+      'property_type' => 'node',
     ),
   );
 }
