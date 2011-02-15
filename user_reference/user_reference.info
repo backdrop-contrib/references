@@ -4,4 +4,5 @@ description = Defines a field type for referencing a user from a node.
 package = Fields
 core = 7.x
 dependencies[] = field
+dependencies[] = references
 dependencies[] = options

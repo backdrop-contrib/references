@@ -843,15 +843,6 @@ function node_reference_content_migrate_instance_alter(&$instance_value, $field_
 }
 
 /**
- * Implements hook_views_api().
- */
-function node_reference_views_api() {
-  return array(
-    'api' => '3.0',
-  );
-}
-
-/**
  * Implements hook_field_views_data().
  *
  * In addition to the default field information we add the relationship for
@@ -870,10 +861,12 @@ function node_reference_field_views_data($field) {
     $id_column = $columns['nid'];
     if (isset($data[$table])) {
       $data[$table][$id_column]['relationship'] = array(
+        'handler' => 'references_handler_relationship',
         'base' => 'node',
         'field' => 'nid',
         'base field' => 'nid',
         'label' => $field['field_name'],
+        'field_name' => $field['field_name'],
       );
     }
   }
