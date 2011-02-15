@@ -546,6 +546,30 @@ function node_reference_field_widget_error($element, $error, $form, &$form_state
 }
 
 /**
+ * Builds a list of referenceable nodes suitable for the '#option' FAPI property.
+ *
+ * Warning: the function does NOT take care of encoding or escaping the node
+ * titles. Proper massaging needs to be performed by the caller, according to
+ * the destination FAPI '#type' (radios / checkboxes / select).
+ *
+ * @param $field
+ *   The field definition.
+ *
+ * @return
+ *   An array of referenceable node titles, keyed by node id.
+ */
+function _node_reference_options($field) {
+  $references = _node_reference_potential_references($field);
+
+  $options = array();
+  foreach ($references as $key => $value) {
+    $options[$key] = $value['title'];
+  }
+
+  return $options;
+}
+
+/**
  * Fetch an array of all candidate referenced nodes.
  *
  * This info is used in various places (allowed values, autocomplete
@@ -766,15 +790,7 @@ function node_reference_field_prepare_translation($entity_type, $entity, $field,
  * Implements hook_options_list().
  */
 function node_reference_options_list($field) {
-  $references = _node_reference_potential_references($field);
-
-  // @todo Support optgroups ? I think this was added in late CCK D6.
-  $options = array();
-  foreach ($references as $key => $value) {
-    $options[$key] = $value['title'];
-  }
-
-  return $options;
+  return _node_reference_options($field);
 }
 
 /**
@@ -860,6 +876,14 @@ function node_reference_field_views_data($field) {
     $columns = current($table_data);
     $id_column = $columns['nid'];
     if (isset($data[$table])) {
+      // Filter: swap the handler to the 'in' operator. The callback receives
+      // the field name instead of the whole $field structure to keep views
+      // data to a reasonable size.
+      $data[$table][$id_column]['filter']['handler'] = 'views_handler_filter_in_operator';
+      $data[$table][$id_column]['filter']['options callback'] = 'node_reference_views_options';
+      $data[$table][$id_column]['filter']['options arguments'] = array($field['field_name']);
+
+      // Relationship.
       $data[$table][$id_column]['relationship'] = array(
         'handler' => 'references_handler_relationship',
         'base' => 'node',
@@ -872,4 +896,17 @@ function node_reference_field_views_data($field) {
   }
 
   return $data;
+}
+
+/**
+ * Helper callback for the views_handler_filter_in_operator filter.
+ *
+ * @param $field_name
+ *   The field name.
+ */
+function node_reference_views_options($field_name) {
+  if ($field = field_info_field($field_name)) {
+    return _node_reference_options($field);
+  }
+  return array();
 }

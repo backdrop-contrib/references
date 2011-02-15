@@ -383,6 +383,30 @@ function user_reference_field_widget_error($element, $error, $form, &$form_state
 }
 
 /**
+ * Builds a list of referenceable users suitable for the '#option' FAPI property.
+ *
+ * Warning: the function does NOT take care of encoding or escaping the user
+ * names. Proper massaging needs to be performed by the caller, according to
+ * the destination FAPI '#type' (radios / checkboxes / select).
+ *
+ * @param $field
+ *   The field definition.
+ *
+ * @return
+ *   An array of referenceable user names, keyed by user id.
+ */
+function _user_reference_options($field) {
+  $references = _user_reference_potential_references($field);
+
+  $options = array();
+  foreach ($references as $key => $value) {
+    $options[$key] = $value['title'];
+  }
+
+  return $options;
+}
+
+/**
  * Fetch an array of all candidate referenced users.
  *
  * This info is used in various places (aloowed values, autocomplete results,
@@ -522,15 +546,7 @@ function user_reference_autocomplete($field_name, $string = '') {
  * Implements hook_options_list().
  */
 function user_reference_options_list($field) {
-  $references = _user_reference_potential_references($field);
-
-  // @todo Support optgroups ? I think this was added in late CCK D6.
-  $options = array();
-  foreach ($references as $key => $value) {
-    $options[$key] = $value['title'];
-  }
-
-  return $options;
+  return _user_reference_options($field);
 }
 
 /**
@@ -685,6 +701,14 @@ function user_reference_field_views_data($field) {
     $columns = current($table_data);
     $id_column = $columns['uid'];
     if (isset($data[$table])) {
+      // Filter: swap the handler to the 'in' operator. The callback receives
+      // the field name instead of the whole $field structure to keep views
+      // data to a reasonable size.
+      $data[$table][$id_column]['filter']['handler'] = 'views_handler_filter_in_operator';
+      $data[$table][$id_column]['filter']['options callback'] = 'user_reference_views_filter_options';
+      $data[$table][$id_column]['filter']['options arguments'] = array($field['field_name']);
+
+      // Relationship.
       $data[$table][$id_column]['relationship'] = array(
         'handler' => 'references_handler_relationship',
         'base' => 'users',
@@ -697,4 +721,20 @@ function user_reference_field_views_data($field) {
   }
 
   return $data;
+}
+
+/**
+ * Helper callback for the views_handler_filter_in_operator filter.
+ *
+ * @param $field_name
+ *   The field name.
+ *
+ * @return
+ *   The array of allowed options for the filter.
+ */
+function user_reference_views_filter_options($field_name) {
+  if ($field = field_info_field($field_name)) {
+    return _user_reference_options($field);
+  }
+  return array();
 }
