@@ -1,4 +1,3 @@
-; $Id$
 name = References
 description = Defines common base features for the various reference field types.
 package = Fields
