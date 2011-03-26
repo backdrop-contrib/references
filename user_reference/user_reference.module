@@ -707,6 +707,21 @@ function user_reference_field_views_data($field) {
       $data[$table][$id_column]['filter']['options callback'] = 'user_reference_views_filter_options';
       $data[$table][$id_column]['filter']['options arguments'] = array($field['field_name']);
 
+      // Argument: display users.name in argument titles (handled in our custom
+      // handler) and summary lists (handled by the base views_handler_argument
+      // handler).
+      // Both mechanisms rely on the 'name table' and 'name field' information
+      // below, by joining to a separate copy of the base table from the field
+      // data table.
+      $data[$table][$id_column]['argument']['handler'] = 'references_handler_argument';
+      $data[$table][$id_column]['argument']['name table'] = $table . '_reference';
+      $data[$table][$id_column]['argument']['name field'] = 'name';
+      $data[$table . '_reference']['table']['join'][$table] = array(
+        'left_field' => $id_column,
+        'table' => 'users',
+        'field' => 'uid',
+      );
+
       // Relationship.
       $data[$table][$id_column]['relationship'] = array(
         'handler' => 'references_handler_relationship',

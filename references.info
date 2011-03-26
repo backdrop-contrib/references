@@ -5,3 +5,4 @@ core = 7.x
 dependencies[] = field
 dependencies[] = options
 files[] = views/references_handler_relationship.inc
+files[] = views/references_handler_argument.inc
