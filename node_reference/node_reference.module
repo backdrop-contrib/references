@@ -78,7 +78,6 @@ function node_reference_field_settings_form($field, $instance, $has_data) {
       ? $settings['referenceable_types']
       : array(),
     '#options'       => array_map('check_plain', node_type_get_names()),
-    '#disabled'      => $has_data,
   );
   return $form;
 }
