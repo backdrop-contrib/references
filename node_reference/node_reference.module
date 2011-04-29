@@ -736,18 +736,19 @@ function node_reference_node_type_update($info) {
  * Theme preprocess function.
  *
  * Allows specific node templates for nodes displayed as values of a
- * node_reference field with the 'full node' / 'teaser' formatters.
+ * node_reference field with a specific view mode.
  */
 function node_reference_preprocess_node(&$vars) {
-  // The 'referencing_field' attribute of the node is added by the 'teaser'
-  // and 'full node' formatters.
+  // The 'referencing_field' attribute of the node is added by the
+  // node_reference_node mode formatter (display referenced node
+  // in a specific view mode).
   if (!empty($vars['node']->referencing_field)) {
     $node = $vars['node'];
     $field = $node->referencing_field;
-    $vars['theme_hook_suggestions'][] = 'node-reference';
-    $vars['theme_hook_suggestions'][] = 'node-reference__' . $field['field_name'];
-    $vars['theme_hook_suggestions'][] = 'node-reference__' . $node->type;
-    $vars['theme_hook_suggestions'][] = 'node-reference__' . $field['field_name'] . '__' . $node->type;
+    $vars['theme_hook_suggestions'][] = 'node_reference';
+    $vars['theme_hook_suggestions'][] = 'node_reference__' . $field['field_name'];
+    $vars['theme_hook_suggestions'][] = 'node_reference__' . $node->type;
+    $vars['theme_hook_suggestions'][] = 'node_reference__' . $field['field_name'] . '__' . $node->type;
   }
 }
 
