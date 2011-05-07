@@ -156,8 +156,8 @@ function _node_reference_view_settings_validate($element, &$form_state, $form) {
   }
 
   // Explode the 'args' string into an actual array. Beware, explode() turns an
-  // empty string into an array with one empty string array. We'll need an empty
-  // array instead.
+  // empty string into an array with one empty string. We'll need an empty array
+  // instead.
   $args_string = trim($element['args']['#value']);
   $args = ($args_string === '') ? array() : array_map('trim', explode(',', $args_string));
 
