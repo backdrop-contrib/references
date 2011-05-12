@@ -1,3 +1,9 @@
+References 7.x-2.x
+==================
+
+- Issue #1154998 by yched: Rename _node_reference_potential_references() to node_reference_potential_references().
+
+
 References 7.x-2.0-beta2
 ========================
 
