@@ -149,7 +149,7 @@ function references_potential_references_view($entity_type, $view_name, $display
     'ids' => $options['ids'],
     'title_field' => $options['title_field'],
     'string' => $options['string'],
-    'match' => $options['string'],
+    'match' => $options['match'],
   );
   $view->display_handler->set_option('references_options', $references_options);
 
