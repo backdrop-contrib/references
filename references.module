@@ -158,9 +158,9 @@ function references_potential_references_view($entity_type, $view_name, $display
   if (!isset($fields[$options['title_field']])) {
     $label_options = array(
       'label' => '',
-      'link_to_node' => 0,
+      'link_to_' . $entity_type => 0,
     );
-    $view->add_item($display_name, 'field', 'node', $options['title_field'], $label_options);
+    $view->add_item($display_name, 'field', $entity_type, $options['title_field'], $label_options);
   }
 
   // Limit result set size.

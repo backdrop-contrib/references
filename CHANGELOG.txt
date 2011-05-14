@@ -1,3 +1,9 @@
+References 7.x-2.x
+==================
+
+- Issue #1157530 by yched: node-specific code in references_potential_references_view()
+
+
 References 7.x-2.0-beta3
 ========================
 
