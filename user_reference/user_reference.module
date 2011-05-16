@@ -110,14 +110,16 @@ function user_reference_field_settings_form($field, $instance, $has_data) {
       '#collapsible' => TRUE,
       '#collapsed' => empty($view_settings['view_name']),
       '#description' => $description,
-      // The value of the 'view_and_display' select below will need to be split
-      // into 'view_name' and 'view_display' in the final submitted values, so
-      // we massage the data at validate time (not ideal).
-      '#element_validate' => array('_user_reference_view_settings_validate'),
     );
 
     $views_options = references_get_views_options('user');
     if ($views_options) {
+      // The value of the 'view_and_display' select below will need to be split
+      // into 'view_name' and 'view_display' in the final submitted values, so
+      // we massage the data at validate time on the wrapping element (not
+      // ideal).
+      $form['view']['#element_validate'] = array('_user_reference_view_settings_validate');
+
       $views_options = array('' => '<' . t('none') . '>') + $views_options;
       $default = empty($view_settings['view_name']) ? '' : $view_settings['view_name'] . ':' .$view_settings['display_name'];
       $form['view']['view_and_display'] = array(
@@ -149,7 +151,7 @@ function user_reference_field_settings_form($field, $instance, $has_data) {
 }
 
 /**
- * Validate callback for the 'view settings' fielset.
+ * Validate callback for the 'view settings' fieldset.
  *
  * Puts back the various form values in the expected shape.
  */
