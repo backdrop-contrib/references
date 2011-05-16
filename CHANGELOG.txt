@@ -3,7 +3,7 @@ References 7.x-2.x
 
 - Issue #1157530 by yched: node-specific code in references_potential_references_view().
 - Issue #1157746 by yched: 'match' option not working in views.
-- Issue #1149600 by yched: fix 'Undefined index error' in _[user|user]_reference_view_settings_validate().
+- Issue #1149600 by dafeder, yched: fix 'Undefined index error' in _[user|node]_reference_view_settings_validate().
 
 
 References 7.x-2.0-beta3
