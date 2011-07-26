@@ -933,6 +933,9 @@ function node_reference_content_migrate_field_alter(&$field_value, $instance_val
         'display_name' => 'default',
         'args' => $view_args,
       );
+      if ($view_name) {
+        $field_value['messages'][] = t("The field uses the view @view_name to determine referenceable nodes. You will need to manually edit the view and add a display of type 'References'.");
+      }
       unset($field_value['settings']['advanced_view']);
       unset($field_value['settings']['advanced_view_args']);
 
