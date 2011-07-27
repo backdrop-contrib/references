@@ -880,6 +880,41 @@ function user_reference_field_views_data($field) {
 }
 
 /**
+ * Implements hook_field_views_data_views_data_alter().
+ */
+function user_reference_field_views_data_views_data_alter(&$data, $field) {
+  foreach ($field['bundles'] as $entity_type => $bundles) {
+    $entity_info = entity_get_info($entity_type);
+    $pseudo_field_name = 'reverse_' . $field['field_name'] . '_' . $entity_type;
+
+    list($label, $all_labels) = field_views_field_label($field['field_name']);
+    $entity = $entity_info['label'];
+    if ($entity == t('Node')) {
+      $entity = t('Content');
+    }
+
+    // Only specify target entity type if the field is used in more than one.
+    if (count($field['bundles']) > 1) {
+      $title = t('@field (@field_name) - reverse (to @entity)', array('@entity' => $entity, '@field' => $label, '@field_name' => $field['field_name']));
+    }
+    else {
+      $title = t('@field (@field_name) - reverse', array('@entity' => $entity, '@field' => $label, '@field_name' => $field['field_name']));
+    }
+    $data['users'][$pseudo_field_name]['relationship'] = array(
+      'title' => $title,
+      'help' => t('Relate each @entity referencing the user through @field.', array('@entity' => $entity, '@field' => $label)),
+      'handler' => 'views_handler_relationship_entity_reverse',
+      'field_name' => $field['field_name'],
+      'field table' => _field_sql_storage_tablename($field),
+      'field field' => $field['field_name'] . '_uid',
+      'base' => $entity_info['base table'],
+      'base field' => $entity_info['entity keys']['id'],
+      'label' => t('!field_name', array('!field_name' => $field['field_name'])),
+    );
+  }
+}
+
+/**
  * Helper callback for the views_handler_filter_in_operator filter.
  *
  * @param $field_name
