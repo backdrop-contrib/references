@@ -242,8 +242,18 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
         ->fields('n')
         ->condition('n.nid', $missing_ids)
         ->addTag('node_access');
-      if (!user_access('administer nodes')) {
-        $query->condition('status', 1);
+      // Take the 'view own unpublished content' permission into account to
+      // decide whether unpublished nodes should be hidden.
+      if (!user_access('administer nodes') && !user_access('bypass node access')) {
+        if (user_access('view own unpublished content') && $own_unpublished = db_query('SELECT nid FROM {node} WHERE uid = :uid AND status = :status', array(':uid' => $GLOBALS['user']->uid, ':status' => NODE_NOT_PUBLISHED))->fetchCol()) {
+          $query->condition(db_or()
+            ->condition('n.status', NODE_PUBLISHED)
+            ->condition('n.nid', $own_published, 'IN')
+          );
+        }
+        else {
+          $query->condition('status', NODE_PUBLISHED);
+        }
       }
       $fetched_nodes += $query->execute()->fetchAllAssoc('nid');
     }
