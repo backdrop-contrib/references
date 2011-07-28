@@ -64,6 +64,19 @@ function references_views_plugins() {
         'even empty' => TRUE,
       ),
     ),
+    'row' => array(
+      'references_fields' => array(
+        'title' => t('Inline fields'),
+        'help' => t('Displays the fields with an optional template.'),
+        'handler' => 'references_plugin_row_fields',
+        'theme' => 'views_view_fields',
+        'theme path' => drupal_get_path('module', 'views') . '/theme',
+        'theme file' => 'theme.inc',
+        'uses fields' => TRUE,
+        'uses options' => TRUE,
+        'type' => 'references',
+      ),
+    ),
   );
   return $plugins;
 }
@@ -166,16 +179,6 @@ function references_potential_references_view($entity_type, $view_name, $display
   // Limit result set size.
   $limit = !empty($options['limit']) ? $options['limit'] : 0;
   $view->display_handler->set_option('pager', array('type' => 'some', 'options' => array('items_per_page' => $limit)));
-
-  // If not set, make all fields inline and define a separator.
-  $row_options = $view->display_handler->get_option('row_options');
-  if (empty($row_options['inline'])) {
-    $row_options['inline'] = drupal_map_assoc(array_keys($view->get_items('field', $display_name)));
-  }
-  if (empty($row_options['separator'])) {
-    $row_options['separator'] = '-';
-  }
-  $view->display_handler->set_option('row_options', $row_options);
 
   // Make sure the query is not cached
   $view->is_cacheable = FALSE;
