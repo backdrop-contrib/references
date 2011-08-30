@@ -40,6 +40,8 @@ function user_reference_field_info() {
       'default_formatter' => 'user_reference_default',
       // Support hook_entity_property_info() from contrib "Entity API".
       'property_type' => 'user',
+      // Support default token formatter for field tokens.
+      'default_token_formatter' => 'user_reference_plain',
     ),
   );
 }

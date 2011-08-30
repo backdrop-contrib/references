@@ -41,6 +41,8 @@ function node_reference_field_info() {
       'default_formatter' => 'node_reference_default',
       // Support hook_entity_property_info() from contrib "Entity API".
       'property_type' => 'node',
+      // Support default token formatter for field tokens.
+      'default_token_formatter' => 'node_reference_plain',
     ),
   );
 }
