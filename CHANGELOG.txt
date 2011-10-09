@@ -1,6 +1,7 @@
 References 7.x-2.x
 ==================
 
+#1275096 by Scyther, dereine, and jenlampton: Fix column not found error for nid.
 #1236096 by Dave Reid: fix fatal error on prepare_view (followup to #1094406)
 #1183300 by Pasqualle: Remove maxlength from noderef autocomplete widget.
 #1094406 by h0tw1r3: Added Account for the 'view own unpublished content' perm
