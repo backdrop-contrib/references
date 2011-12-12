@@ -143,6 +143,12 @@ function references_potential_references_view($entity_type, $view_name, $display
     return FALSE;
   }
 
+  // If we have no access to the View an empty result should be returned to
+  // avoid triggering the fallback results.
+  if  (!$view->access(array($display_name))) {
+    return array();
+  }
+
   // Temporary backwards compatibility for fields migrated from CCK D6: accept
   // 'default' display, but dynamically add a 'references' display out of it.
   if ($display_name == 'default') {
