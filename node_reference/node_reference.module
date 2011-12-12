@@ -1045,6 +1045,7 @@ function node_reference_field_views_data($field) {
         'handler' => 'references_handler_relationship',
         'base' => 'node',
         'base field' => 'nid',
+        'field' => $id_column,
         'label' => $field['field_name'],
         'field_name' => $field['field_name'],
       );
