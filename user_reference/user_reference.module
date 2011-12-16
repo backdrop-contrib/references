@@ -288,6 +288,12 @@ function user_reference_field_formatter_info() {
       'description' => t('Display the name of the referenced user as plain text.'),
       'field types' => array('user_reference'),
     ),
+    'user_reference_user' => array(
+      'label'       => t('Rendered user'),
+      'description' => t('Display the referenced user in a specific view mode'),
+      'field types' => array('user_reference'),
+      'settings'    => array('user_reference_view_mode' => 'full'),
+    ),
     'user_reference_uid' => array(
       'label' => t('User ID'),
       'description' => t('Display the referenced user ID'),
@@ -315,6 +321,22 @@ function user_reference_field_formatter_settings_form($field, $instance, $view_m
   $element = array();
 
   switch ($display['type']) {
+    case 'user_reference_user':
+      $entity_info = entity_get_info('user');
+      $modes = $entity_info['view modes'];
+      $options = array();
+      foreach ($modes as $name => $mode) {
+        $options[$name] = $mode['label'];
+      }
+      $element['user_reference_view_mode'] = array(
+        '#title'   => t('View mode'),
+        '#type'    => 'select',
+        '#options' => $options,
+        '#default_value' => $settings['user_reference_view_mode'],
+        // Never empty, so no #empty_option
+      );
+      break;
+
     case 'user_reference_path':
       $element['alias'] = array(
         '#type' => 'checkbox',
@@ -341,6 +363,13 @@ function user_reference_field_formatter_settings_summary($field, $instance, $vie
   $summary = array();
 
   switch ($display['type']) {
+    case 'user_reference_user':
+      $entity_info = entity_get_info('user');
+      $modes = $entity_info['view modes'];
+      $mode = $modes[$settings['user_reference_view_mode']]['label'];
+      $summary[] = t('View mode: %mode', array('%mode' => $mode));
+      break;
+
     case 'user_reference_path':
       $summary[] = t('Aliased path: %yes_no', array('%yes_no' => $settings['alias'] ? t('Yes') : t('No')));
       $summary[] = t('Absolute URL: %yes_no', array('%yes_no' => $settings['absolute'] ? t('Yes') : t('No')));
@@ -348,6 +377,44 @@ function user_reference_field_formatter_settings_summary($field, $instance, $vie
   }
 
   return implode('<br />', $summary);
+}
+
+
+/**
+ * Implements hook_field_formatter_prepare_view().
+ *
+ * Preload all user referenced by items using 'full entity' formatters.
+ */
+function user_reference_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
+  // For each item, $item['user'] has been populated with information from the
+  // base table in user_reference_field_prepare_view().
+  // For the 'user_reference_user' formatter, however, we need fully loaded
+  // user objects.
+
+  // Collect uids to load.
+  // @todo : can we make clever use of the recursion queue here ?
+  $uids = array();
+  foreach ($displays as $id => $display) {
+    if ($display['type'] == 'user_reference_user') {
+      foreach ($items[$id] as $delta => $item) {
+        if ($item['access']) {
+          $uids[$item['uid']] = $item['uid'];
+        }
+      }
+    }
+  }
+  $accounts = user_load_multiple($uids);
+
+  // Add the loaded users to the items.
+  foreach ($displays as $id => $display) {
+    if ($display['type'] == 'user_reference_user') {
+      foreach ($items[$id] as $delta => $item) {
+        if ($item['access']) {
+          $items[$id][$delta]['user'] = $accounts[$item['uid']];
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -385,6 +452,70 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
             $result[$delta] = array(
               '#markup' => check_plain($user->name),
             );
+          }
+        }
+      }
+      break;
+
+    case 'user_reference_user':
+      $view_mode = $display['settings']['user_reference_view_mode'];
+      // To prevent infinite recursion caused by reference cycles, we store
+      // diplayed accounts in a recursion queue.
+      $recursion_queue = &drupal_static(__FUNCTION__, array());
+
+      // If no 'referencing entity' is set, we are starting a new 'reference
+      // thread' and need to reset the queue.
+      // @todo Bug: $entity->referencing_entity on accounts referenced in a different
+      // thread on the page. E.g: 1 references 1+2 / 2 references 1+2 / visit homepage.
+      // We'd need a more accurate way...
+      if (!isset($entity->referencing_entity)) {
+        $recursion_queue = array();
+      }
+
+      // The recursion queue only needs to track nodes.
+      if ($entity_type == 'user') {
+        list($id) = entity_extract_ids($entity_type, $entity);
+        $recursion_queue[$id] = $id;
+      }
+
+      // Check the recursion queue to determine which accounts should be fully
+      // displayed, and which accounts will only be displayed as a username.
+      $users_display = array();
+      foreach ($items as $delta => $item) {
+        if ($item['access'] && !isset($recursion_queue[$item['uid']])) {
+          $users_display[$item['uid']] = $item['user'];
+        }
+      }
+
+      // Load and build the fully displayed nodes.
+      if ($users_display) {
+        $users_built = array('users' => array('#sorted' => TRUE));
+        foreach ($users_display as $uid => $account) {
+          $users_display[$uid]->referencing_entity = $entity;
+          $users_display[$uid]->referencing_field = $field['field_name'];
+          $users_built['users'][$account->uid] = user_view($account, $settings['user_reference_view_mode']);
+        }
+      }
+
+      // Assemble the render array.
+      foreach ($items as $delta => $item) {
+        if ($item['access']) {
+          if (isset($users_display[$item['uid']])) {
+            $result[$delta] = $users_built['users'][$item['uid']];
+          }
+          else {
+            $account = $item['user'];
+            $uri = entity_uri('user', $account);
+            $result[$delta] = array(
+              '#type' => 'link',
+              '#title' => $account->name,
+              '#href' => $uri['path'],
+              '#options' => $uri['options'],
+            );
+            if (!$account->status) {
+              $result[$delta]['#prefix'] = '<span class="user-unpublished">';
+              $result[$delta]['#suffix'] = '</span>';
+            }
           }
         }
       }

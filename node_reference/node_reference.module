@@ -395,7 +395,7 @@ function node_reference_field_formatter_prepare_view($entity_type, $entities, $f
   // For each item, $item['node'] has been populated with information from the
   // base table in node_reference_field_prepare_view().
   // For the 'node_reference_node' formatter, however, we need fully loaded
-  // nodes. 
+  // nodes objects.
 
   // Collect nids to load.
   // @todo : can we make clever use of the recursion queue here ?
