@@ -223,6 +223,50 @@ function user_reference_field_validate($entity_type, $entity, $field, $instance,
 }
 
 /**
+ * Implements hook_field_prepare_view().
+ */
+function user_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
+  // @todo : do we need the static ?
+  $fetched_users = &drupal_static(__FUNCTION__, array());
+
+  // Extract nids to check.
+  $ids = array();
+  foreach ($items as $id => $entity_items) {
+    foreach ($entity_items as $delta => $item) {
+      if (is_array($item)) {
+        // @todo Keep that ?
+        // Default to 'not accessible'.
+        $items[$id][$delta]['access'] = FALSE;
+        if (!empty($item['uid']) && is_numeric($item['uid'])) {
+          $ids[$item['uid']] = $item['uid'];
+        }
+      }
+    }
+  }
+
+  if ($ids) {
+    // Load information about nids that we haven't already loaded during
+    // this page request.
+    $missing_ids = array_diff($ids, array_keys($fetched_users));
+    if (!empty($missing_ids)) {
+      $query = db_select('users', 'u')
+        ->fields('u')
+        ->condition('u.uid', $missing_ids, 'IN');
+      $fetched_users += $query->execute()->fetchAllAssoc('uid');
+    }
+
+    foreach ($items as $id => $entity_items) {
+      foreach ($entity_items as $delta => $item) {
+        if (is_array($item) && !empty($item['uid']) && isset($fetched_users[$item['uid']])) {
+          $items[$id][$delta]['user'] = $fetched_users[$item['uid']];
+          $items[$id][$delta]['access'] = TRUE;
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_field_is_empty().
  */
 function user_reference_field_is_empty($item, $field) {
@@ -244,13 +288,73 @@ function user_reference_field_formatter_info() {
       'description' => t('Display the name of the referenced user as plain text.'),
       'field types' => array('user_reference'),
     ),
+    'user_reference_uid' => array(
+      'label' => t('User ID'),
+      'description' => t('Display the referenced user ID'),
+      'field types' => array('user_reference'),
+    ),
+    'user_reference_path' => array(
+      'label' => t('URL as plain text'),
+      'description' => t('Display the URL of the referenced user'),
+      'field types' => array('user_reference'),
+      'settings' => array(
+        'alias' => TRUE,
+        'absolute' => FALSE
+      ),
+    ),
   );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function user_reference_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element = array();
+
+  switch ($display['type']) {
+    case 'user_reference_path':
+      $element['alias'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Display the aliased path (if exists) instead of the system path'),
+        '#default_value' => $settings['alias'],
+      );
+      $element['absolute'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Display an absolute URL'),
+        '#default_value' => $settings['absolute'],
+      );
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function user_reference_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = array();
+
+  switch ($display['type']) {
+    case 'user_reference_path':
+      $summary[] = t('Aliased path: %yes_no', array('%yes_no' => $settings['alias'] ? t('Yes') : t('No')));
+      $summary[] = t('Absolute URL: %yes_no', array('%yes_no' => $settings['absolute'] ? t('Yes') : t('No')));
+      break;
+  }
+
+  return implode('<br />', $summary);
 }
 
 /**
  * Implements hook_field_formatter_view().
  */
 function user_reference_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $settings = $display['settings'];
   $result = array();
 
   // @todo Optimisation: use hook_field_formatter_prepare_view() to load
@@ -265,18 +369,49 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
   switch ($display['type']) {
     case 'user_reference_default':
     case 'user_reference_plain':
-      $titles = _user_reference_get_user_names($uids);
       foreach ($items as $delta => $item) {
-        if ($display['type'] == 'user_reference_default') {
+        if ($item['access']) {
+          $user = $item['user'];
+          if ($display['type'] == 'user_reference_default') {
+            $uri = entity_uri('user', $user);
+            $result[$delta] = array(
+              '#type' => 'link',
+              '#title' => $user->name,
+              '#href' => $uri['path'],
+              '#options' => $uri['options'],
+            );
+          }
+          else {
+            $result[$delta] = array(
+              '#markup' => check_plain($user->name),
+            );
+          }
+        }
+      }
+      break;
+
+    case 'user_reference_uid':
+      foreach ($items as $delta => $item) {
+        if ($item['access']) {
           $result[$delta] = array(
-            '#type' => 'link',
-            '#title' => $titles[$item['uid']],
-            '#href' => 'user/' . $item['uid'],
+            '#markup' => $item['uid'],
           );
         }
-        else {
+      }
+      break;
+
+    case 'user_reference_path':
+      foreach ($items as $delta => $item) {
+        if ($item['access']) {
+          $uri = entity_uri('user', $item['user']);
+          $options = array(
+            'absolute' => $settings['absolute'],
+            'alias' => !$settings['alias'],
+          );
+
+          $options += $uri['options'];
           $result[$delta] = array(
-            '#markup' => check_plain($titles[$item['uid']]),
+            '#markup' => url($uri['path'], $options),
           );
         }
       }
