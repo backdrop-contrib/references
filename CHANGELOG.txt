@@ -1,6 +1,8 @@
 References 7.x-2.x
 ==================
 
+#988856 by Nephele, johnv, rickmanelius, BlakeLucchesi ... : Added Feeds mapper
+  for node_reference and user_reference fields.
 #1051624 by Stalski: Added "rendered user in a given view mode" formatter for
   user_reference fields.
 #1085576 by henrrrik, stamina, yched: Added "raw ID" and "raw path" formatters.

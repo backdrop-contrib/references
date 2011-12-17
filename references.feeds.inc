@@ -262,7 +262,7 @@ function references_feeds_set_target($source, $entity, $target, $value) {
       case 'uid':
         // Make sure it is a positive integer.
         if ((is_int($options['string']) || ctype_digit($options['string'])) && $options['string'] > 0 && $options['string'] !== '') {
-	        // Make sure it is a valid node id or user id for this field.
+          // Make sure it is a valid node id or user id for this field.
           $matches = $validate_function($info, array($options['string']));
           foreach ($matches as $k => $v) {
             if ($options['string'] == $k) {
