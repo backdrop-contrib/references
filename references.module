@@ -20,6 +20,16 @@ function reference_autocomplete_access($entity_type, $bundle, $field_name, $enti
 }
 
 /**
+ * Implements hook_init().
+ */
+function references_init() {
+  // Include feeds.module integration.
+  if (module_exists('feeds')) {
+    module_load_include('inc','references','references.feeds');
+  }
+}
+
+/**
  * Implements hook_views_api().
  */
 function references_views_api() {
