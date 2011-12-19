@@ -1,6 +1,8 @@
 References 7.x-2.x
 ==================
 
+#1219224 by kunago, michaelfavia, yched: Added support for optgroups in select
+  widget (for referenceable nodes/users provided by a view).
 #988856 by Nephele, johnv, rickmanelius, BlakeLucchesi ... : Added Feeds mapper
   for node_reference and user_reference fields.
 #1051624 by Stalski: Added "rendered user in a given view mode" formatter for
