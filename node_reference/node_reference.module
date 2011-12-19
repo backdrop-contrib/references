@@ -724,18 +724,28 @@ function node_reference_field_widget_error($element, $error, $form, &$form_state
  *
  * @param $field
  *   The field definition.
+ * @param $flat
+ *   Whether optgroups are allowed.
  *
  * @return
- *   An array of referenceable node titles, keyed by node id.
+ *   An array of referenceable node titles, keyed by node id. If the $flat
+ *   parameter is TRUE, the list might be nested by optgroup first.
  */
-function _node_reference_options($field) {
+function _node_reference_options($field, $flat = TRUE) {
   $references = node_reference_potential_references($field);
 
   $options = array();
   foreach ($references as $key => $value) {
     // We use the richer 'rendered' value rather than the raw title, but we must
     // take care of removing tags and leaving HTML entities unencoded.
-    $options[$key] = html_entity_decode(strip_tags($value['rendered']), ENT_QUOTES);;
+    $label = html_entity_decode(strip_tags($value['rendered']), ENT_QUOTES);
+    if (empty($value['group']) || $flat) {
+      $options[$key] = $label;
+    }
+    else {
+      $group = html_entity_decode(strip_tags($value['group']), ENT_QUOTES);
+      $options[$group][$key] = $label;
+    }
   }
 
   return $options;
@@ -983,7 +993,7 @@ function node_reference_field_prepare_translation($entity_type, $entity, $field,
  * Implements hook_options_list().
  */
 function node_reference_options_list($field) {
-  return _node_reference_options($field);
+  return _node_reference_options($field, FALSE);
 }
 
 /**

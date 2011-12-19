@@ -70,6 +70,8 @@ function references_views_plugins() {
         'theme' => 'views_view_unformatted',
         'uses row plugin' => TRUE,
         'uses fields' => TRUE,
+        'uses options' => TRUE,
+        'uses grouping' => TRUE,
         'type' => 'references',
         'even empty' => TRUE,
       ),

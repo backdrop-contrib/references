@@ -36,6 +36,7 @@ class references_plugin_style extends views_plugin_style {
         // Collect the rendered row, and the raw title value.
         $results[$values->{$id_field_alias}] = array(
           'rendered' => $rendered,
+          'group' => $title,
           'title' => $this->view->field[$title_field]->get_value($values),
         );
 
