@@ -1,6 +1,8 @@
 References 7.x-2.x
 ==================
 
+#1194086 by Dave Reid, mariagwyn, yched: Display entity labels through entity_label()
+  (formatters only for now)
 #1219224 by kunago, michaelfavia, yched: Added support for optgroups in select
   widget (for referenceable nodes/users provided by a view).
 #988856 by Nephele, johnv, rickmanelius, BlakeLucchesi ... : Added Feeds mapper

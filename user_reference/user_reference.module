@@ -226,15 +226,15 @@ function user_reference_field_validate($entity_type, $entity, $field, $instance,
  * Implements hook_field_prepare_view().
  */
 function user_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
-  // @todo : do we need the static ?
-  $fetched_users = &drupal_static(__FUNCTION__, array());
+  $checked_ids = &drupal_static(__FUNCTION__, array());
 
-  // Extract nids to check.
+  // Set an 'access' property on each item (TRUE if the user exists).
+
+  // Extract ids to check.
   $ids = array();
   foreach ($items as $id => $entity_items) {
     foreach ($entity_items as $delta => $item) {
       if (is_array($item)) {
-        // @todo Keep that ?
         // Default to 'not accessible'.
         $items[$id][$delta]['access'] = FALSE;
         if (!empty($item['uid']) && is_numeric($item['uid'])) {
@@ -245,20 +245,24 @@ function user_reference_field_prepare_view($entity_type, $entities, $field, $ins
   }
 
   if ($ids) {
-    // Load information about nids that we haven't already loaded during
-    // this page request.
-    $missing_ids = array_diff($ids, array_keys($fetched_users));
-    if (!empty($missing_ids)) {
+    // Load information about ids that we haven't already loaded during this
+    // page request.
+    $ids_to_check = array_diff($ids, array_keys($checked_ids));
+    if (!empty($ids_to_check)) {
       $query = db_select('users', 'u')
-        ->fields('u')
-        ->condition('u.uid', $missing_ids, 'IN');
-      $fetched_users += $query->execute()->fetchAllAssoc('uid');
+        ->fields('u', array('uid'))
+        ->condition('u.uid', $ids_to_check, 'IN');
+      $accessible_ids = $query->execute()->fetchAllAssoc('uid');
+
+      // Populate our static list so that we do not query on those ids again.
+      foreach ($ids_to_check as $id) {
+        $checked_ids[$id] = isset($accessible_ids[$id]);
+      }
     }
 
     foreach ($items as $id => $entity_items) {
       foreach ($entity_items as $delta => $item) {
-        if (is_array($item) && !empty($item['uid']) && isset($fetched_users[$item['uid']])) {
-          $items[$id][$delta]['user'] = $fetched_users[$item['uid']];
+        if (is_array($item) && !empty($item['uid']) && !empty($checked_ids[$item['uid']])) {
           $items[$id][$delta]['access'] = TRUE;
         }
       }
@@ -386,35 +390,32 @@ function user_reference_field_formatter_settings_summary($field, $instance, $vie
  * Preload all user referenced by items using 'full entity' formatters.
  */
 function user_reference_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
-  // For each item, $item['user'] has been populated with information from the
-  // base table in user_reference_field_prepare_view().
-  // For the 'user_reference_user' formatter, however, we need fully loaded
-  // user objects.
+  // Load the referenced users, except for the 'user_reference_uid' which does
+  // not need full objects.
 
-  // Collect uids to load.
-  // @todo : can we make clever use of the recursion queue here ?
-  $uids = array();
+  // Collect ids to load.
+  $ids = array();
   foreach ($displays as $id => $display) {
-    if ($display['type'] == 'user_reference_user') {
+    if ($display['type'] != 'user_reference_uid') {
       foreach ($items[$id] as $delta => $item) {
         if ($item['access']) {
-          $uids[$item['uid']] = $item['uid'];
+          $ids[$item['uid']] = $item['uid'];
         }
       }
     }
   }
-  $accounts = user_load_multiple($uids);
+  $entities = user_load_multiple($ids);
 
-  // Add the loaded users to the items.
+  // Add the loaded user objects to the items.
   foreach ($displays as $id => $display) {
-    if ($display['type'] == 'user_reference_user') {
+    if ($display['type'] != 'user_reference_uid') {
       foreach ($items[$id] as $delta => $item) {
         if ($item['access']) {
-          $items[$id][$delta]['user'] = $accounts[$item['uid']];
+          $items[$id][$delta]['user'] = $entities[$item['uid']];
         }
       }
     }
-  }
+  } 
 }
 
 /**
@@ -439,18 +440,19 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
       foreach ($items as $delta => $item) {
         if ($item['access']) {
           $user = $item['user'];
+          $label = entity_label('user', $user);
           if ($display['type'] == 'user_reference_default') {
             $uri = entity_uri('user', $user);
             $result[$delta] = array(
               '#type' => 'link',
-              '#title' => $user->name,
+              '#title' => $label,
               '#href' => $uri['path'],
               '#options' => $uri['options'],
             );
           }
           else {
             $result[$delta] = array(
-              '#markup' => check_plain($user->name),
+              '#markup' => check_plain($label),
             );
           }
         }
@@ -505,10 +507,11 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
           }
           else {
             $account = $item['user'];
+            $label = entity_label('user', $user);
             $uri = entity_uri('user', $account);
             $result[$delta] = array(
               '#type' => 'link',
-              '#title' => $account->name,
+              '#title' => $label,
               '#href' => $uri['path'],
               '#options' => $uri['options'],
             );

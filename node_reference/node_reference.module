@@ -218,10 +218,12 @@ function node_reference_field_validate($entity_type, $entity, $field, $instance,
  * Implements hook_field_prepare_view().
  */
 function node_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
-  // @todo : do we need the static ?
-  $fetched_nodes = &drupal_static(__FUNCTION__, array());
+  $checked_ids = &drupal_static(__FUNCTION__, array());
 
-  // Extract nids to check.
+  // Set an 'access' property on each item (TRUE if the node exists and is 
+  // accessible by the current user.
+
+  // Extract ids to check.
   $ids = array();
   foreach ($items as $id => $entity_items) {
     foreach ($entity_items as $delta => $item) {
@@ -236,15 +238,15 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
   }
 
   if ($ids) {
-    // Load information about nids that we haven't already loaded during
-    // this page request.
-    $missing_ids = array_diff($ids, array_keys($fetched_nodes));
-    if (!empty($missing_ids)) {
+    // Load information about ids that we haven't already loaded during this
+    // page request.
+    $ids_to_check = array_diff($ids, array_keys($checked_ids));
+    if (!empty($ids_to_check)) {
       $query = db_select('node', 'n')
-        ->fields('n')
+        ->fields('n', array('nid'))
         ->addTag('node_access');
       $condition = db_and()
-        ->condition('n.nid', $missing_ids, 'IN')
+        ->condition('n.nid', $ids_to_check, 'IN')
         ->condition('n.status', NODE_PUBLISHED);
       // Take the 'view own unpublished content' permission into account to
       // decide whether unpublished nodes should be hidden.
@@ -257,13 +259,17 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
         }
       }
       $query->condition($condition);
-      $fetched_nodes += $query->execute()->fetchAllAssoc('nid');
+      $accessible_ids = $query->execute()->fetchAllAssoc('nid');
+
+      // Populate our static list so that we do not query on those ids again.
+      foreach ($ids_to_check as $id) {
+        $checked_ids[$id] = isset($accessible_ids[$id]);
+      }
     }
 
     foreach ($items as $id => $entity_items) {
       foreach ($entity_items as $delta => $item) {
-        if (is_array($item) && !empty($item['nid']) && isset($fetched_nodes[$item['nid']])) {
-          $items[$id][$delta]['node'] = $fetched_nodes[$item['nid']];
+        if (is_array($item) && !empty($item['nid']) && !empty($checked_ids[$item['nid']])) {
           $items[$id][$delta]['access'] = TRUE;
         }
       }
@@ -392,31 +398,28 @@ function node_reference_field_formatter_settings_summary($field, $instance, $vie
  * Preload all nodes referenced by items using 'full entity' formatters.
  */
 function node_reference_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
-  // For each item, $item['node'] has been populated with information from the
-  // base table in node_reference_field_prepare_view().
-  // For the 'node_reference_node' formatter, however, we need fully loaded
-  // nodes objects.
+  // Load the referenced nodes, except for the 'node_reference_nid' which does
+  // not need full objects.
 
-  // Collect nids to load.
-  // @todo : can we make clever use of the recursion queue here ?
-  $nids = array();
+  // Collect ids to load.
+  $ids = array();
   foreach ($displays as $id => $display) {
-    if ($display['type'] == 'node_reference_node') {
+    if ($display['type'] != 'node_reference_nid') {
       foreach ($items[$id] as $delta => $item) {
         if ($item['access']) {
-          $nids[$item['nid']] = $item['nid'];
+          $ids[$item['nid']] = $item['nid'];
         }
       }
     }
   }
-  $nodes = node_load_multiple($nids);
+  $entities = node_load_multiple($ids);
 
   // Add the loaded nodes to the items.
   foreach ($displays as $id => $display) {
-    if ($display['type'] == 'node_reference_node') {
+    if ($display['type'] != 'node_reference_nid') {
       foreach ($items[$id] as $delta => $item) {
         if ($item['access']) {
-          $items[$id][$delta]['node'] = $nodes[$item['nid']];
+          $items[$id][$delta]['node'] = $entities[$item['nid']];
         }
       }
     }
@@ -436,18 +439,19 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
       foreach ($items as $delta => $item) {
         if ($item['access']) {
           $node = $item['node'];
+          $label = entity_label('node', $node);
           if ($display['type'] == 'node_reference_default') {
             $uri = entity_uri('node', $node);
             $result[$delta] = array(
               '#type' => 'link',
-              '#title' => $node->title,
+              '#title' => $label,
               '#href' => $uri['path'],
               '#options' => $uri['options'],
             );
           }
           else {
             $result[$delta] = array(
-              '#markup' => check_plain($node->title),
+              '#markup' => check_plain($label),
             );
           }
           if (!$node->status) {
@@ -504,10 +508,11 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
           }
           else {
             $node = $item['node'];
+            $label = entity_label('node', $node);
             $uri = entity_uri('node', $node);
             $result[$delta] = array(
               '#type' => 'link',
-              '#title' => $node->title,
+              '#title' => $label,
               '#href' => $uri['path'],
               '#options' => $uri['options'],
             );
