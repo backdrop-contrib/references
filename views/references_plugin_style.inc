@@ -22,8 +22,6 @@ class references_plugin_style extends views_plugin_style {
     // Grab the alias of the 'id' field added by references_plugin_display.
     $id_field_alias = $this->display->handler->id_field_alias;
 
-    // @todo We don't display grouping info for now. Could be useful for select
-    // widget, though.
     $results = array();
     $this->view->row_index = 0;
     foreach ($sets as $title => $records) {
