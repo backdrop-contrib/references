@@ -1,6 +1,8 @@
 References 7.x-2.x
 ==================
 
+#1378086 by yched: Stop implicitly adding the 'node title / user name' field in
+  Reference views if it is not present in the view definition.
 #1288852 by yched: Fixed "Trying to get property of non-object" with fatal error
   on user_reference fields using a view (when the view does not include the
   user name as a field).

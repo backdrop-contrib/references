@@ -184,12 +184,12 @@ function references_potential_references_view($entity_type, $view_name, $display
   );
   $view->display_handler->set_option('references_options', $references_options);
 
-  // We do need the title field, so add it if not present (unlikely, but...)
+  // We need the title field for autocomplete widgets, so add it (hidden) if not
+  // present.
   $fields = $view->get_items('field', $display_name);
   if (!isset($fields[$options['title_field']])) {
     $label_options = array(
-      'label' => '',
-      'link_to_' . $entity_type => 0,
+      'exclude' => 1,
     );
     $view->add_item($display_name, 'field', $entity_info['base table'], $options['title_field'], $label_options);
   }
