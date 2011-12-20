@@ -1,6 +1,9 @@
 References 7.x-2.x
 ==================
 
+#1288852 by yched: Fixed "Trying to get property of non-object" with fatal error
+  on user_reference fields using a view (when the view does not include the
+  user name as a field).
 #1194086 by Dave Reid, mariagwyn, yched: Display entity labels through entity_label()
   (formatters only for now)
 #1219224 by kunago, michaelfavia, yched: Added support for optgroups in select
