@@ -195,12 +195,7 @@ function references_feeds_set_target($source, $entity, $target, $value) {
 
   // Handle comma delimited or non-multiple values.
   if (!is_array($value)) {
-    if (strpos($value, ',')) {
-      $value = explode(',', $value);
-    }
-    else {
-      $value = array($value);
-    }
+    $value = array($value);
   }
 
   // Determine the field we are matching against, and whether duplicates are allowed.
