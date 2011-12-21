@@ -766,15 +766,14 @@ function _user_reference_options($field, $flat = TRUE) {
 
   $options = array();
   foreach ($references as $key => $value) {
-    // We use the richer 'rendered' value rather than the raw title, but we must
-    // take care of removing tags and leaving HTML entities unencoded.
-    $label = html_entity_decode(strip_tags($value['rendered']), ENT_QUOTES);
     if (empty($value['group']) || $flat) {
-      $options[$key] = $label;
+      $options[$key] = $value['rendered'];
     }
     else {
+      // The group name, displayed in selects, cannot contain tags, and should
+      // have HTML entities unencoded.
       $group = html_entity_decode(strip_tags($value['group']), ENT_QUOTES);
-      $options[$group][$key] = $label;
+      $options[$group][$key] = $value['rendered'];
     }
   }
 
@@ -1205,8 +1204,16 @@ function user_reference_field_views_data_views_data_alter(&$data, $field) {
  *   The array of allowed options for the filter.
  */
 function user_reference_views_filter_options($field_name) {
+  $options = array();
+
   if ($field = field_info_field($field_name)) {
-    return _user_reference_options($field);
+    $options = _user_reference_options($field, TRUE);
+    // The options will be used as is in checkboxes, and thus need to be
+    // sanitized first.
+    foreach ($options as $key => $value) {
+      $options[$key] = field_filter_xss($value);
+    }
   }
-  return array();
+
+  return $options;
 }
