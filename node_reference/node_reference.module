@@ -845,8 +845,10 @@ function _node_reference_potential_references_standard($field, $options) {
   $node_nid_alias   = $query->addField('n', 'nid');
   $node_title_alias = $query->addField('n', 'title', 'node_title');
   $node_type_alias  = $query->addField('n', 'type',  'node_type');
-  $query->addTag('node_access');
-  $query->addMetaData('id', ' _node_reference_potential_references_standard');
+  $query->addTag('node_access')
+    ->addMetaData('id', ' _node_reference_potential_references_standard')
+    ->addMetaData('field', $field)
+    ->addMetaData('options', $options);
 
   if (is_array($field['settings']['referenceable_types'])) {
     $query->condition('n.type', $field['settings']['referenceable_types'], 'IN');

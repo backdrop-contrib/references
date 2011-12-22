@@ -867,10 +867,12 @@ function _user_reference_potential_references_standard($field, $options) {
   }
 
   $query = db_select('users', 'u')
-    ->addMetaData('id', ' _user_reference_potential_references_standard')
     // Select the whole record, so that format_username() has enough
     // information.
-    ->fields('u');
+    ->fields('u')
+    ->addMetaData('id', ' _user_reference_potential_references_standard')
+    ->addMetaData('field', $field)
+    ->addMetaData('options', $options);
 
   // Enable this filter only if any statuses checked (and not both).
   if (count($filter_status) == 1) {
