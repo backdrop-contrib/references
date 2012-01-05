@@ -221,7 +221,7 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
   $checked_ids = &drupal_static(__FUNCTION__, array());
 
   // Set an 'access' property on each item (TRUE if the node exists and is 
-  // accessible by the current user.
+  // accessible by the current user).
 
   // Extract ids to check.
   $ids = array();
@@ -243,22 +243,30 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
     $ids_to_check = array_diff($ids, array_keys($checked_ids));
     if (!empty($ids_to_check)) {
       $query = db_select('node', 'n')
+        ->addTag('node_access')
         ->fields('n', array('nid'))
-        ->addTag('node_access');
-      $condition = db_and()
-        ->condition('n.nid', $ids_to_check, 'IN')
-        ->condition('n.status', NODE_PUBLISHED);
-      // Take the 'view own unpublished content' permission into account to
-      // decide whether unpublished nodes should be hidden.
-      if (!user_access('administer nodes') && !user_access('bypass node access')) {
+        // WHERE n.nid IN (nids to check) AND ...
+        ->condition('n.nid', $ids_to_check, 'IN');
+
+      // Unless the user has the right permissions, restrict on the node status.
+      // (note: the 'view any unpublished content' permission is provided by the
+      // 'view_unpublished' contrib module.)
+      if (!user_access('bypass node access') && !user_access('view any unpublished content')) {
+        // ... AND n.status = 1
+        $status_condition = db_or()
+          ->condition('n.status', NODE_PUBLISHED);
+
+        // Take the 'view own unpublished content' permission into account to
+        // decide whether some unpublished nodes should still be visible.
         if (user_access('view own unpublished content') && $own_unpublished = db_query('SELECT nid FROM {node} WHERE uid = :uid AND status = :status', array(':uid' => $GLOBALS['user']->uid, ':status' => NODE_NOT_PUBLISHED))->fetchCol()) {
-          // (n.nid IN (nodes) AND n.status = 1) OR n.nid = (unpublished)
-          $condition = db_or()
-            ->condition($condition)
+          // ... AND (n.status = 1 OR n.nid IN (own unpublished))
+          $status_condition
             ->condition('n.nid', $own_unpublished, 'IN');
         }
+
+        $query->condition($status_condition);
       }
-      $query->condition($condition);
+
       $accessible_ids = $query->execute()->fetchAllAssoc('nid');
 
       // Populate our static list so that we do not query on those ids again.

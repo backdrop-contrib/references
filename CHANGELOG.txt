@@ -3,6 +3,9 @@ References 7.x-2.x
 
 #1391814 by yched: Fixed encoded HTML entities in select widget (regression
   introduced in 2.0)
+#1354580 by bforchhammer, yched: Fixed unpublished referenced nodes not
+  displayed to users that are allowed to see them (regression introduced in 2.0)
+#1345816 by bforchhammer: Added support for the 'view_unpublished' module.
 
 References 7.x-2.0
 ==================
