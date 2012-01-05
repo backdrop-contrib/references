@@ -6,6 +6,7 @@ References 7.x-2.x
 #1354580 by bforchhammer, yched: Fixed unpublished referenced nodes not
   displayed to users that are allowed to see them (regression introduced in 2.0)
 #1345816 by bforchhammer: Added support for the 'view_unpublished' module.
+#1256280 by girishmuraly: Added query alterability in hook_field_prepare_view().
 
 References 7.x-2.0
 ==================

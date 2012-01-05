@@ -250,6 +250,8 @@ function user_reference_field_prepare_view($entity_type, $entities, $field, $ins
     $ids_to_check = array_diff($ids, array_keys($checked_ids));
     if (!empty($ids_to_check)) {
       $query = db_select('users', 'u')
+        ->addMetaData('id', 'user_reference_field_prepare_view')
+        ->addMetaData('field', $field)
         ->fields('u', array('uid'))
         ->condition('u.uid', $ids_to_check, 'IN');
       $accessible_ids = $query->execute()->fetchAllAssoc('uid');

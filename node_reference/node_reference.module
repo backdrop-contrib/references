@@ -244,6 +244,8 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
     if (!empty($ids_to_check)) {
       $query = db_select('node', 'n')
         ->addTag('node_access')
+        ->addMetaData('id', 'node_reference_field_prepare_view')
+        ->addMetaData('field', $field)
         ->fields('n', array('nid'))
         // WHERE n.nid IN (nids to check) AND ...
         ->condition('n.nid', $ids_to_check, 'IN');
