@@ -7,6 +7,7 @@ References 7.x-2.x
   displayed to users that are allowed to see them (regression introduced in 2.0)
 #1345816 by bforchhammer: Added support for the 'view_unpublished' module.
 #1256280 by girishmuraly: Added query alterability in hook_field_prepare_view().
+#1183300 by scor: Fixed extraneaous #maxlength in node_reference_autocomplete widget.
 
 References 7.x-2.0
 ==================
