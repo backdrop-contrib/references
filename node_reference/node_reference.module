@@ -48,29 +48,6 @@ function node_reference_field_info() {
 }
 
 /**
- * Implements hook_field_schema().
- */
-function node_reference_field_schema($field) {
-  $columns = array(
-    'nid' => array(
-      'type'     => 'int',
-      'unsigned' => TRUE,
-      'not null' => FALSE,
-    ),
-  );
-  return array(
-    'columns' => $columns,
-    'indexes' => array('nid' => array('nid')),
-    'foreign keys' => array(
-      'nid' => array(
-        'table' => 'node',
-        'columns' => array('nid' => 'nid'),
-      ),
-    ),
-  );
-}
-
-/**
  * Implements hook_field_settings_form().
  */
 function node_reference_field_settings_form($field, $instance, $has_data) {
@@ -220,7 +197,7 @@ function node_reference_field_validate($entity_type, $entity, $field, $instance,
 function node_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
   $checked_ids = &drupal_static(__FUNCTION__, array());
 
-  // Set an 'access' property on each item (TRUE if the node exists and is 
+  // Set an 'access' property on each item (TRUE if the node exists and is
   // accessible by the current user).
 
   // Extract ids to check.

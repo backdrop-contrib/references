@@ -47,29 +47,6 @@ function user_reference_field_info() {
 }
 
 /**
- * Implements hook_field_schema();
- */
-function user_reference_field_schema($field) {
-  $columns = array(
-    'uid' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => FALSE,
-    ),
-  );
-  return array(
-    'columns' => $columns,
-    'indexes' => array('uid' => array('uid')),
-    'foreign keys' => array(
-      'uid' => array(
-        'table' => 'users',
-        'columns' => array('uid' => 'uid'),
-      ),
-    ),
-  );
-}
-
-/**
  * Implements hook_field_settings_form().
  */
 function user_reference_field_settings_form($field, $instance, $has_data) {
@@ -417,7 +394,7 @@ function user_reference_field_formatter_prepare_view($entity_type, $entities, $f
         }
       }
     }
-  } 
+  }
 }
 
 /**
