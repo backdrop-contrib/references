@@ -1045,7 +1045,7 @@ function user_reference_content_migrate_field_alter(&$field_value, $instance_val
         'args' => $view_args,
       );
       if ($view_name) {
-        $field_value['messages'][] = t("The field uses the view @view_name to determine referenceable users. You will need to manually edit the view and add a display of type 'References'.");
+        $field_value['messages'][] = t("The field uses the view @view_name to determine referenceable users. You will need to manually edit the view and add a display of type 'References'.", array('@view_name' => $view_name));
       }
       unset($field_value['settings']['advanced_view']);
       unset($field_value['settings']['advanced_view_args']);
