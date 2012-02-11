@@ -1180,7 +1180,7 @@ function user_reference_field_views_data_views_data_alter(&$data, $field) {
 }
 
 /**
- * Helper callback for the views_handler_filter_in_operator filter.
+ * 'options callback' for the views_handler_filter_in_operator filter.
  *
  * @param $field_name
  *   The field name.
@@ -1193,10 +1193,14 @@ function user_reference_views_filter_options($field_name) {
 
   if ($field = field_info_field($field_name)) {
     $options = _user_reference_options($field, TRUE);
-    // The options will be used as is in checkboxes, and thus need to be
-    // sanitized first.
+
+    // The options are displayed in checkboxes within the filter admin form, and
+    // in a select within an exposed filter. Checkboxes accept HTML, other
+    // entities should be encoded; selects require the exact opposite: no HTML,
+    // no encoding. We go for a middle ground: strip tags, leave entities
+    // unencoded.
     foreach ($options as $key => $value) {
-      $options[$key] = field_filter_xss($value);
+      $options[$key] = strip_tags($value);
     }
   }
 

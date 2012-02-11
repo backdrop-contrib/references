@@ -11,6 +11,7 @@ References 7.x-2.x
   widget.
 #1410300 by yched: Fixed hook_field_install() should live in .install files.
 #1409022 by yched: Fixed missing view name notification message in D6 migration.
+#1391814 followup by yched: Fixed raw HTML in Views exposed filters.
 
 References 7.x-2.0
 ==================

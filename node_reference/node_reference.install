@@ -27,3 +27,12 @@ function node_reference_field_schema($field) {
     ),
   );
 }
+
+/**
+ * Rebuild views data cache (a callabck was renamed).
+ */
+function node_reference_update_7000() {
+  if (function_exists('views_invalidate_cache')) {
+    views_invalidate_cache();
+  }
+}
