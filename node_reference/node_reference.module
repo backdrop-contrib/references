@@ -945,11 +945,11 @@ function node_reference_preprocess_node(&$vars) {
   // in a specific view mode).
   if (!empty($vars['node']->referencing_field)) {
     $node = $vars['node'];
-    $field = $node->referencing_field;
-    $vars['theme_hook_suggestions'][] = 'node_reference';
-    $vars['theme_hook_suggestions'][] = 'node_reference__' . $field['field_name'];
-    $vars['theme_hook_suggestions'][] = 'node_reference__' . $node->type;
-    $vars['theme_hook_suggestions'][] = 'node_reference__' . $field['field_name'] . '__' . $node->type;
+    $field_name = $node->referencing_field;
+    $vars['theme_hook_suggestions'][] = 'node__node_reference';
+    $vars['theme_hook_suggestions'][] = 'node__node_reference__' . $field_name;
+    $vars['theme_hook_suggestions'][] = 'node__node_reference__' . $node->type;
+    $vars['theme_hook_suggestions'][] = 'node__node_reference__' . $field_name . '__' . $node->type;
   }
 }
 

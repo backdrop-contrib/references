@@ -12,6 +12,8 @@ References 7.x-2.x
 #1410300 by yched: Fixed hook_field_install() should live in .install files.
 #1409022 by yched: Fixed missing view name notification message in D6 migration.
 #1391814 followup by yched: Fixed raw HTML in Views exposed filters.
+#998848 followup by larowlan, stevector, yched: template suggestions for
+  referenced node in a specific view mode are wrong.
 
 References 7.x-2.0
 ==================
