@@ -664,14 +664,14 @@ function node_reference_autocomplete_validate($element, &$form_state, $form) {
       // Explicit nid. Check that the 'title' part matches the actual title for
       // the nid.
       list(, $title, $nid) = $matches;
-      if (!empty($title)) {
+      if (!empty($nid)) {
         $real_title = db_select('node', 'n')
           ->fields('n', array('title'))
           ->condition('n.nid', $nid)
           ->execute()
           ->fetchField();
-        if (trim($title) != trim($real_title)) {
-          form_error($element, t('%name: title mismatch. Please check your selection.', array('%name' => $instance['label'])));
+        if (empty($real_title)) {
+          form_error($element, t('%name: No node found. Please check your selection.', array('%name' => $instance['label'])));
         }
       }
     }
