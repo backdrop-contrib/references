@@ -236,8 +236,11 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
           ->condition('n.status', NODE_PUBLISHED);
 
         // Take the 'view own unpublished content' permission into account to
-        // decide whether some unpublished nodes should still be visible.
-        if (user_access('view own unpublished content') && $own_unpublished = db_query('SELECT nid FROM {node} WHERE uid = :uid AND status = :status', array(':uid' => $GLOBALS['user']->uid, ':status' => NODE_NOT_PUBLISHED))->fetchCol()) {
+        // decide whether some unpublished nodes should still be visible. We
+        // only need the items in $ids_to_check because those are the only
+        // entries that we are interested in. Any other nodes created by the
+        // user are simply ignored so lets only retrieve that subset.
+        if (user_access('view own unpublished content') && ($own_unpublished = db_query('SELECT nid FROM {node} WHERE uid = :uid AND status = :status AND nid IN (:nodes)', array(':uid' => $GLOBALS['user']->uid, ':status' => NODE_NOT_PUBLISHED, ':nodes' => $ids_to_check))->fetchCol())) {
           // ... AND (n.status = 1 OR n.nid IN (own unpublished))
           $status_condition
             ->condition('n.nid', $own_unpublished, 'IN');
