@@ -586,6 +586,7 @@ function node_reference_field_widget_settings_form($field, $instance) {
       '#options'          => array(
         'starts_with'     => t('Starts with'),
         'contains'        => t('Contains'),
+        'fuzzy'           => t('Fuzzy search'),
       ),
       '#description'      => t('Select the method used to collect autocomplete suggestions. Note that <em>Contains</em> can cause performance issues on sites with thousands of nodes.'),
     );
@@ -854,6 +855,13 @@ function _node_reference_potential_references_standard($field, $options) {
 
       case 'starts_with':
         $query->condition('n.title', $options['string'] . '%', 'LIKE');
+        break;
+
+      case 'fuzzy':
+        $words = explode(' ', $options['string']);
+        foreach ($words as $word) {
+          $query->condition('n.title', '%' . $word . '%', 'LIKE');
+        }
         break;
 
       case 'equals':
