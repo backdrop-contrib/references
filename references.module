@@ -40,6 +40,19 @@ function references_views_api() {
 }
 
 /**
+ * Implements hook_autoload_info().
+ */
+function references_autoload_info() {
+  return array(
+    'references_handler_argument'     => 'views/references_handler_argument.inc',
+    'references_handler_relationship' => 'views/references_handler_relationship.inc',
+    'references_plugin_display'       => 'views/references_plugin_display.inc',
+    'references_plugin_row_fields'    => 'views/references_plugin_row_fields.inc',
+    'references_plugin_style'         => 'views/references_plugin_style.inc',
+  );
+}
+
+/**
  * Implements hook_views_plugins().
  *
  * Defines some plugins used by the Views modes for
