@@ -6,6 +6,7 @@
  */
 class references_plugin_style extends views_plugin_style {
   function render() {
+    $this->theme_functions(); /* XXX */
     $options = $this->display->handler->get_option('references_options');
 
     // Play nice with View UI 'preview' : if the view is not executed through
