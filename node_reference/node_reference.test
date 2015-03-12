@@ -62,7 +62,7 @@ class NodeReferenceFormTest extends FieldTestCase {
       'settings'   => array('referenceable_types' => array_keys($allowed)),
     ));
     $entity = field_test_create_stub_entity();
-    $form = drupal_get_form('field_test_entity_form', $entity);
+    $form = backdrop_get_form('field_test_entity_form', $entity);
     $options = $form[$this->field_name][$this->langcode]['#options'];
     $this->assertTrue(isset($options['_none']), t('Empty choice offered for reference'), $group);
     unset($options['_none']);

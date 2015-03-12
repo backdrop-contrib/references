@@ -249,7 +249,7 @@ function references_feeds_set_target($source, $entity, $target, $value) {
 
         // Alert if no match is found.
         if (empty($options['ids'])) {
-          drupal_set_message(t('%title does not match an existing '.$typename, array('%title' => $options['string'])));
+          backdrop_set_message(t('%title does not match an existing '.$typename, array('%title' => $options['string'])));
         }
         break;
 
@@ -268,7 +268,7 @@ function references_feeds_set_target($source, $entity, $target, $value) {
 
         // Alert if no match is found.
         if (empty($options['ids'])) {
-          drupal_set_message(t('%id is not a valid '.$typename.' id for this field.', array('%id' => $options['string'])));
+          backdrop_set_message(t('%id is not a valid '.$typename.' id for this field.', array('%id' => $options['string'])));
         }
         break;
 
@@ -280,7 +280,7 @@ function references_feeds_set_target($source, $entity, $target, $value) {
 
         // Alert if no match is found.
         if (empty($options['ids'])) {
-          drupal_set_message(t('%id is not a valid '.$typename.' id for this field.', array('%id' => $v)));
+          backdrop_set_message(t('%id is not a valid '.$typename.' id for this field.', array('%id' => $v)));
         }
         break;
     }

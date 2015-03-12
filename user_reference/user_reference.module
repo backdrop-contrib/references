@@ -203,7 +203,7 @@ function user_reference_field_validate($entity_type, $entity, $field, $instance,
  * Implements hook_field_prepare_view().
  */
 function user_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
-  $checked_ids = &drupal_static(__FUNCTION__, array());
+  $checked_ids = &backdrop_static(__FUNCTION__, array());
 
   // Set an 'access' property on each item (TRUE if the user exists).
 
@@ -442,7 +442,7 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
       $view_mode = $display['settings']['user_reference_view_mode'];
       // To prevent infinite recursion caused by reference cycles, we store
       // diplayed accounts in a recursion queue.
-      $recursion_queue = &drupal_static(__FUNCTION__, array());
+      $recursion_queue = &backdrop_static(__FUNCTION__, array());
 
       // If no 'referencing entity' is set, we are starting a new 'reference
       // thread' and need to reset the queue.
@@ -540,7 +540,7 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
  * Store user names collected in the curent request.
  */
 function _user_reference_get_user_names($uids, $known_titles = array()) {
-  $titles = &drupal_static(__FUNCTION__, array());
+  $titles = &backdrop_static(__FUNCTION__, array());
 
   // Save titles we receive.
   $titles += $known_titles;
@@ -802,7 +802,7 @@ function user_reference_potential_references($field, $options = array()) {
     'limit' => 0,
   );
 
-  $results = &drupal_static(__FUNCTION__, array());
+  $results = &backdrop_static(__FUNCTION__, array());
 
   // Create unique id for static cache.
   $cid = $field['field_name'] . ':' . $options['match'] . ':'
@@ -863,7 +863,7 @@ function _user_reference_potential_references_standard($field, $options) {
   }
 
   // Skip filter when "authenticated user" choosen.
-  if ($filter_roles && !isset($filter_roles[DRUPAL_AUTHENTICATED_RID])) {
+  if ($filter_roles && !isset($filter_roles[BACKDROP_AUTHENTICATED_ROLE])) {
     $query->join('users_roles', 'r', 'u.uid = r.uid');
     $query->condition('r.rid', array_keys($filter_roles), 'IN');
   }
@@ -930,7 +930,7 @@ function user_reference_autocomplete($entity_type, $bundle, $field_name, $string
     // Remove link tags Add a class wrapper for a few required CSS overrides.
     $matches[$row['title'] . " [uid:$id]"] = '<div class="reference-autocomplete">' . $suggestion . '</div>';
   }
-  drupal_json_output($matches);
+  backdrop_json_output($matches);
 }
 
 /**

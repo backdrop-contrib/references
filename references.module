@@ -35,7 +35,7 @@ function references_init() {
 function references_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'references') . '/views',
+    'path' => backdrop_get_path('module', 'references') . '/views',
   );
 }
 

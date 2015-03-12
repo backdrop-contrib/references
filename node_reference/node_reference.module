@@ -195,7 +195,7 @@ function node_reference_field_validate($entity_type, $entity, $field, $instance,
  * Implements hook_field_prepare_view().
  */
 function node_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
-  $checked_ids = &drupal_static(__FUNCTION__, array());
+  $checked_ids = &backdrop_static(__FUNCTION__, array());
 
   // Set an 'access' property on each item (TRUE if the node exists and is
   // accessible by the current user).
@@ -455,7 +455,7 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
     case 'node_reference_node':
       // To prevent infinite recursion caused by reference cycles, we store
       // diplayed nodes in a recursion queue.
-      $recursion_queue = &drupal_static(__FUNCTION__, array());
+      $recursion_queue = &backdrop_static(__FUNCTION__, array());
 
       // If no 'referencing entity' is set, we are starting a new 'reference
       // thread' and need to reset the queue.
@@ -792,7 +792,7 @@ function node_reference_potential_references($field, $options = array()) {
     'limit' => 0,
   );
 
-  $results = &drupal_static(__FUNCTION__, array());
+  $results = &backdrop_static(__FUNCTION__, array());
 
   // Create unique id for static cache.
   $cid = $field['field_name'] . ':' . $options['match'] . ':'
@@ -920,7 +920,7 @@ function node_reference_autocomplete($entity_type, $bundle, $field_name, $string
     $matches[$row['title'] . " [nid:$id]"] = '<div class="reference-autocomplete">' . $suggestion . '</div>';
   }
 
-  drupal_json_output($matches);
+  backdrop_json_output($matches);
 }
 
 /**
