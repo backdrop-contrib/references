@@ -44,7 +44,7 @@ class NodeReferenceFormTest extends FieldTestCase {
 
     $this->nodes = array();
     foreach (node_type_get_names() as $type_name => $type_title) {
-      $this->nodes[$type_name] = $this->drupalCreateNode(array(
+      $this->nodes[$type_name] = $this->backdropCreateNode(array(
         'type'  => $type_name,
         'title' => $this->randomName(8),
       ));
@@ -104,8 +104,8 @@ class NodeReferenceFormTest extends FieldTestCase {
    */
   function testLongNodeReferenceWidget() {
     // Create regular test user.
-    $web_user = $this->drupalCreateUser(array('create article content', 'access content'));
-    $this->drupalLogin($web_user);
+    $web_user = $this->backdropCreateUser(array('create article content', 'access content'));
+    $this->backdropLogin($web_user);
 
     // Create test field instance on article node type.
     $instance = array(
@@ -120,18 +120,18 @@ class NodeReferenceFormTest extends FieldTestCase {
 
     // Create a node with a short title and a node with a title longer than
     // 128 characters.
-    $node_short_title = $this->drupalCreateNode(array(
+    $node_short_title = $this->backdropCreateNode(array(
       'type'  => 'page',
       'title' => $this->randomName(8),
     ));
-    $node_long_title = $this->drupalCreateNode(array(
+    $node_long_title = $this->backdropCreateNode(array(
       'type'  => 'page',
       'title' => $this->randomName(200),
     ));
 
     // Display node creation form.
     $langcode = LANGUAGE_NONE;
-    $this->drupalGet('node/add/article');
+    $this->backdropGet('node/add/article');
     $this->assertFieldByName("{$this->field_name}[$langcode][0][nid]", '', t('Widget is displayed'));
 
     // Submit node form with autocomplete value for short title.
@@ -139,7 +139,7 @@ class NodeReferenceFormTest extends FieldTestCase {
       'title' => $this->randomName(8),
       "{$this->field_name}[$langcode][0][nid]" => $node_short_title->title . ' [nid:' . $node_short_title->nid . ']',
     );
-    $this->drupalPost('node/add/article', $edit, t('Save'));
+    $this->backdropPost('node/add/article', $edit, t('Save'));
     $this->assertRaw(t('!post %title has been created.', array('!post' => 'Article', '%title' => $edit["title"])), t('Article created.'));
     $this->assertText($node_short_title->title, t('Referenced node title is displayed.'));
 
@@ -148,7 +148,7 @@ class NodeReferenceFormTest extends FieldTestCase {
       'title' => $this->randomName(8),
       "{$this->field_name}[$langcode][0][nid]" => $node_long_title->title . ' [nid:' . $node_long_title->nid . ']',
     );
-    $this->drupalPost('node/add/article', $edit, t('Save'));
+    $this->backdropPost('node/add/article', $edit, t('Save'));
     $this->assertRaw(t('!post %title has been created.', array('!post' => 'Article', '%title' => $edit["title"])), t('Article created.'));
     $this->assertText($node_long_title->title, t('Referenced node title is displayed.'));
   }

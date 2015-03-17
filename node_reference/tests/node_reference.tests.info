@@ -1,0 +1,6 @@
+[NodeReferenceFormTest]
+name = Node reference 
+description = Make sure nodes are referenceable in entity forms. 
+group = References 
+file = node_reference.test
+
