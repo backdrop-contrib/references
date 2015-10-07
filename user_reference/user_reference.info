@@ -3,6 +3,7 @@ description = Defines a field type for referencing a user from a node.
 package = Fields
 core = 7.x
 backdrop = 1.x
+type = module
 dependencies[] = field
 dependencies[] = references
 dependencies[] = options

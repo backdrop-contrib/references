@@ -1,6 +1,7 @@
 name = References UUID
 core = 7.x
 backdrop = 1.x
+type = module
 package = Fields
 dependencies[] = references
 dependencies[] = uuid

@@ -3,6 +3,7 @@ description = Defines a field type for referencing one node from another.
 package = Fields
 core = 7.x
 backdrop = 1.x
+type = module
 dependencies[] = field
 dependencies[] = references
 dependencies[] = options
