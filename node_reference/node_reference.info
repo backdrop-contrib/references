@@ -7,4 +7,3 @@ type = module
 dependencies[] = field
 dependencies[] = references
 dependencies[] = options
-files[] = node_reference.test
