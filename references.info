@@ -3,6 +3,7 @@ description = Defines common base features for the various reference field types
 package = Fields
 core = 7.x
 backdrop = 1.x
+type = module
 dependencies[] = field
 dependencies[] = options
 files[] = views/references_handler_relationship.inc
