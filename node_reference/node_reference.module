@@ -838,11 +838,29 @@ function _node_reference_potential_references_standard($field, $options) {
   }
 
   $query = db_select('node', 'n');
+
+  if (!user_access('bypass node access')) {
+    // If the user is able to view their own unpublished nodes, allow them to
+    // see these in addition to published nodes. Check that they actually have
+    // some unpublished nodes to view before adding the condition.
+    if (user_access('view own unpublished content') && $own_unpublished = db_query('SELECT nid FROM {node} WHERE uid = :uid AND status = :status', array(':uid' => $GLOBALS['user']->uid, ':status' => NODE_NOT_PUBLISHED))->fetchCol()) {
+      $query->condition(db_or()
+            ->condition('n.status', NODE_PUBLISHED)
+            ->condition('n.nid', $own_unpublished, 'IN')
+      );
+    }
+    else {
+      // If not, restrict the query to published nodes.
+      $query->condition('n.status', NODE_PUBLISHED);
+    }
+
+    $query->addTag('node_access');
+  }
+
   $node_nid_alias   = $query->addField('n', 'nid');
   $node_title_alias = $query->addField('n', 'title', 'node_title');
   $node_type_alias  = $query->addField('n', 'type',  'node_type');
-  $query->addTag('node_access')
-    ->addMetaData('id', ' _node_reference_potential_references_standard')
+  $query->addMetaData('id', ' _node_reference_potential_references_standard')
     ->addMetaData('field', $field)
     ->addMetaData('options', $options);
 
