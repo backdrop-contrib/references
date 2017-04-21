@@ -16,7 +16,7 @@ function node_reference_feeds_parser_sources_alter(&$sources, $content_type) {
     $fields = field_info_fields();
     foreach ($fields as $field) {
       if ($field['type'] == 'node_reference' && isset($field['bundles']['node']) && in_array($content_type, $field['bundles']['node'])) {
-        $sources['parent:node_reference:'. $field['field_name']] = array(
+        $sources['parent:node_reference:' . $field['field_name']] = array(
           'name' => t('Feed node: Node Reference (nid): @field_name', array('@field_name' => $field['field_name'])),
           'description' => t('Node References from the parent feed node.'),
           'callback' => 'node_reference_feeds_get_source',
@@ -242,14 +242,14 @@ function references_feeds_set_target($source, $entity, $target, $value) {
         // Validate node title or user name.
         if ((is_string($options['string']) && $options['string'] != '') || is_numeric($options['string'])) {
           // Lookup potential exact matches for the value (limit to one result).
-          $matches = $validate_function($info,$options);
+          $matches = $validate_function($info, $options);
           // Use the first element of the potential matches.
           $options['ids']= key($matches);
         }
 
         // Alert if no match is found.
         if (empty($options['ids'])) {
-          drupal_set_message(t('%title does not match an existing '.$typename, array('%title' => $options['string'])));
+          drupal_set_message(t('%title does not match an existing ' . $typename, array('%title' => $options['string'])));
         }
         break;
 
@@ -268,19 +268,19 @@ function references_feeds_set_target($source, $entity, $target, $value) {
 
         // Alert if no match is found.
         if (empty($options['ids'])) {
-          drupal_set_message(t('%id is not a valid '.$typename.' id for this field.', array('%id' => $options['string'])));
+          drupal_set_message(t('%id is not a valid ' . $typename. ' id for this field.', array('%id' => $options['string'])));
         }
         break;
 
       case 'guid':
       case 'url':
         // get the value from table feeds-item.
-        $result = db_query('SELECT f.entity_id FROM {feeds_item} f WHERE f.'.$match_key.' = :v', array( ':v' => $v) );
+        $result = db_query('SELECT f.entity_id FROM {feeds_item} f WHERE f.' . $match_key . ' = :v', array(':v' => $v) );
         $options['ids'] = $result->fetchField();
 
         // Alert if no match is found.
         if (empty($options['ids'])) {
-          drupal_set_message(t('%id is not a valid '.$typename.' id for this field.', array('%id' => $v)));
+          drupal_set_message(t('%id is not a valid ' . $typename . ' id for this field.', array('%id' => $v)));
         }
         break;
     }
@@ -291,7 +291,7 @@ function references_feeds_set_target($source, $entity, $target, $value) {
         // Add the reference, ignoring duplicates.
         $field['und'][] = $reference;
       }
-      else if (!in_array($reference, $field['und'])) {
+      elseif (!in_array($reference, $field['und'])) {
         // Add the reference only if it doesn't already exist.
         $field['und'][] = $reference;
       }

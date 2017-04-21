@@ -25,7 +25,7 @@ function reference_autocomplete_access($entity_type, $bundle, $field_name, $enti
 function references_init() {
   // Include feeds.module integration.
   if (module_exists('feeds')) {
-    module_load_include('inc','references','references.feeds');
+    module_load_include('inc', 'references', 'references.feeds');
   }
 }
 
@@ -114,7 +114,7 @@ function references_get_views_options($entity_type) {
   foreach ($displays as $data) {
     list($view, $display_id) = $data;
     if ($view->base_table == $entity_info['base table']) {
-      $options[$view->name . ':' . $display_id] = $view->name .' - ' . $view->display[$display_id]->display_title;
+      $options[$view->name . ':' . $display_id] = $view->name . ' - ' . $view->display[$display_id]->display_title;
     }
   }
 
