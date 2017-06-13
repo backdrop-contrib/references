@@ -43,9 +43,9 @@ function node_reference_feeds_get_source(FeedsSource $source, FeedsParserResult 
   if ($node = node_load($source->feed_nid)) {
     $results = array();
     $field = substr($key, 22);
-    if (!empty($node->{$field}['und'])) {
-      foreach ($node->{$field}['und'] as $delta => $value) {
-        $results[] = $value['nid'];
+    if (!empty($node->{$field}[LANGUAGE_NONE])) {
+      foreach ($node->{$field}[LANGUAGE_NONE] as $delta => $value) {
+        $results[] = $value[LANGUAGE_NONE];
       }
     }
     return $results;
@@ -222,8 +222,8 @@ function references_feeds_set_target($source, $entity, $target, $value) {
   }
 
   $field = isset($entity->$target) ? $entity->$target : array();
-  if (!isset($field['und'])) {
-    $field['und'] = array();
+  if (!isset($field[LANGUAGE_NONE])) {
+    $field[LANGUAGE_NONE] = array();
   }
 
   // Match values against nodes and add to field.
@@ -289,11 +289,11 @@ function references_feeds_set_target($source, $entity, $target, $value) {
       $reference = array($idname => $options['ids']);
       if (!empty($duplicates)) {
         // Add the reference, ignoring duplicates.
-        $field['und'][] = $reference;
+        $field[LANGUAGE_NONE][] = $reference;
       }
-      elseif (!in_array($reference, $field['und'])) {
+      elseif (!in_array($reference, $field[LANGUAGE_NONE])) {
         // Add the reference only if it doesn't already exist.
-        $field['und'][] = $reference;
+        $field[LANGUAGE_NONE][] = $reference;
       }
 
       if ($info['cardinality'] == 1) {
