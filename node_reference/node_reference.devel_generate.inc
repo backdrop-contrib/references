@@ -1,6 +1,5 @@
 <?php
 // $Id: nodereference.devel_generate.inc,v 1.1 2010/01/28 21:06:42 weitzman Exp $
-
 function node_reference_devel_generate($object, $field, $instance, $bundle) {
   if (field_behaviors_widget('multiple values', $instance) == FIELD_BEHAVIOR_CUSTOM) {
     return devel_generate_multiple('_node_reference_devel_generate', $object, $field, $instance, $bundle);

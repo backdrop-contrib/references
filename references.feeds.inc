@@ -44,7 +44,7 @@ function node_reference_feeds_get_source(FeedsSource $source, FeedsParserResult 
     $results = array();
     $field = substr($key, 22);
     if (!empty($node->{$field}[LANGUAGE_NONE])) {
-      foreach ($node->{$field}[LANGUAGE_NONE] as $delta => $value) {
+      foreach ($node->{$field}[LANGUAGE_NONE] as $value) {
         $results[] = $value[LANGUAGE_NONE];
       }
     }

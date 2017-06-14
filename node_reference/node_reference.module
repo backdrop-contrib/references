@@ -196,9 +196,11 @@ function node_reference_field_validate($entity_type, $entity, $field, $instance,
  */
 function node_reference_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
   $checked_ids = &drupal_static(__FUNCTION__, array());
-
-  // Set an 'access' property on each item (TRUE if the node exists and is
-  // accessible by the current user).
+  
+  /**
+   * Set an 'access' property on each item (TRUE if the node exists and is
+   * accessible by the current user).
+   */
 
   // Extract ids to check.
   $ids = array();
@@ -388,8 +390,10 @@ function node_reference_field_formatter_settings_summary($field, $instance, $vie
  * Preload all nodes referenced by items using 'full entity' formatters.
  */
 function node_reference_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
-  // Load the referenced nodes, except for the 'node_reference_nid' which does
-  // not need full objects.
+  /**
+   * Load the referenced nodes, except for the 'node_reference_nid' which does
+   * not need full objects.
+   */
 
   // Collect ids to load.
   $ids = array();
@@ -637,7 +641,7 @@ function node_reference_autocomplete_value($element, $input = FALSE, $form_state
     $nid = $element['#default_value'];
     if (!empty($nid)) {
       $q = db_select('node', 'n');
-      $node_title_alias = $q->addField('n', 'title');
+      $q->addField('n', 'title');
       $q->addTag('node_access')
         ->condition('n.nid', $nid)
         ->range(0, 1);
@@ -666,7 +670,7 @@ function node_reference_autocomplete_validate($element, &$form_state, $form) {
     if (!empty($matches)) {
       // Explicit nid. Check that the 'title' part matches the actual title for
       // the nid.
-      list(, $title, $nid) = $matches;
+      list(, , $nid) = $matches;
       if (!empty($nid)) {
         $real_title = db_select('node', 'n')
           ->fields('n', array('title'))
@@ -857,7 +861,7 @@ function _node_reference_potential_references_standard($field, $options) {
     $query->addTag('node_access');
   }
 
-  $node_nid_alias   = $query->addField('n', 'nid');
+  $query->addField('n', 'nid');
   $node_title_alias = $query->addField('n', 'title', 'node_title');
   $node_type_alias  = $query->addField('n', 'type',  'node_type');
   $query->addMetaData('id', ' _node_reference_potential_references_standard')
@@ -952,7 +956,7 @@ function node_reference_autocomplete($entity_type, $bundle, $field_name, $string
 function node_reference_node_type_update($info) {
   if (!empty($info->old_type) && $info->old_type != $info->type) {
     $fields = field_info_fields();
-    foreach ($fields as $field_name => $field) {
+    foreach ($fields as $field) {
       if ($field['type'] == 'node_reference' && isset($field['settings']['referenceable_types'][$info->old_type])) {
         $field['settings']['referenceable_types'][$info->type] = empty($field['settings']['referenceable_types'][$info->old_type]) ? 0 : $info->type;
         unset($field['settings']['referenceable_types'][$info->old_type]);
@@ -1078,7 +1082,7 @@ function node_reference_content_migrate_instance_alter(&$instance_value, $field_
   switch ($field_value['type']) {
     case 'nodereference':
       // Massage formatters.
-      foreach ($instance_value['display'] as $context => &$display) {
+      foreach ($instance_value['display'] as &$display) {
         switch ($display['type']) {
           case 'full':
           case 'teaser':
@@ -1126,7 +1130,7 @@ function node_reference_field_views_data($field) {
 
   $storage = $field['storage']['details']['sql'];
 
-  foreach ($storage as $age => $table_data) {
+  foreach ($storage as $table_data) {
     $table = key($table_data);
     $columns = current($table_data);
     $id_column = $columns['nid'];
@@ -1176,7 +1180,7 @@ function node_reference_field_views_data_views_data_alter(&$data, $field) {
     $entity_info = entity_get_info($entity_type);
     $pseudo_field_name = 'reverse_' . $field['field_name'] . '_' . $entity_type;
 
-    list($label, $all_labels) = field_views_field_label($field['field_name']);
+    list($label) = field_views_field_label($field['field_name']);
     $entity = $entity_info['label'];
     if ($entity == t('Node')) {
       $entity = t('Content');

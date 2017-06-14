@@ -169,10 +169,12 @@ function references_potential_references_view($entity_type, $view_name, $display
 
   $view->set_display($display_name);
 
-  // @todo From merlinofchaos on IRC : arguments using summary view can defeat
-  // the style setting.
-  // We might also need to check if there's an argument, and set its
-  // style_plugin as well.
+  /**
+   * @todo From merlinofchaos on IRC : arguments using summary view can defeat
+   * the style setting.
+   * We might also need to check if there's an argument, and set its
+   * style_plugin as well.
+   */
 
   // Set additional options to let references_plugin_display::query() narrow
   // the results.

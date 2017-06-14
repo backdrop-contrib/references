@@ -206,7 +206,6 @@ function user_reference_field_prepare_view($entity_type, $entities, $field, $ins
   $checked_ids = &drupal_static(__FUNCTION__, array());
 
   // Set an 'access' property on each item (TRUE if the user exists).
-
   // Extract ids to check.
   $ids = array();
   foreach ($items as $id => $entity_items) {
@@ -371,7 +370,6 @@ function user_reference_field_formatter_settings_summary($field, $instance, $vie
 function user_reference_field_formatter_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays) {
   // Load the referenced users, except for the 'user_reference_uid' which does
   // not need full objects.
-
   // Collect ids to load.
   $ids = array();
   foreach ($displays as $id => $display) {
@@ -404,15 +402,8 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
   $settings = $display['settings'];
   $result = array();
 
-  // @todo Optimisation: use hook_field_formatter_prepare_view() to load
-  // user names or full user entities in 'multiple' mode.
-
-  // Collect the list of user ids.
-  $uids = array();
-  foreach ($items as $delta => $item) {
-    $uids[$item['uid']] = $item['uid'];
-  }
-
+  // @todo Optimisation: use hook_field_formatter_prepare_view() to load.
+  // User names or full user entities in 'multiple' mode.
   switch ($display['type']) {
     case 'user_reference_default':
     case 'user_reference_plain':
@@ -439,7 +430,7 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
       break;
 
     case 'user_reference_user':
-      $view_mode = $display['settings']['user_reference_view_mode'];
+
       // To prevent infinite recursion caused by reference cycles, we store
       // diplayed accounts in a recursion queue.
       $recursion_queue = &drupal_static(__FUNCTION__, array());
@@ -1102,7 +1093,7 @@ function user_reference_field_views_data($field) {
 
   $storage = $field['storage']['details']['sql'];
 
-  foreach ($storage as $age => $table_data) {
+  foreach ($storage as $table_data) {
     $table = key($table_data);
     $columns = current($table_data);
     $id_column = $columns['uid'];
@@ -1152,7 +1143,7 @@ function user_reference_field_views_data_views_data_alter(&$data, $field) {
     $entity_info = entity_get_info($entity_type);
     $pseudo_field_name = 'reverse_' . $field['field_name'] . '_' . $entity_type;
 
-    list($label, $all_labels) = field_views_field_label($field['field_name']);
+    list($label) = field_views_field_label($field['field_name']);
     $entity = $entity_info['label'];
     if ($entity == t('Node')) {
       $entity = t('Content');
