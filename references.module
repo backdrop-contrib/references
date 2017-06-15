@@ -208,3 +208,22 @@ function references_potential_references_view($entity_type, $view_name, $display
 
   return $results;
 }
+
+/**
+ * Implements hook_help().
+ */
+function references_help($path, $arg) {
+
+  switch ($path) {
+    case 'admin/help#references':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The References project contains straight ports of the node_reference and user_reference modules to the Drupal 7 API.') . '</p>';
+      $output .= '<h3>' . t('Usage') . '</h3>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('Access: Structure » Content types and edit one Content type.') . '</li>';
+      $output .= '<li>' . t('Go to Manage Fields and add new field with field type = "Node Reference" or "User Reference".') . '</li>';
+      $output .= '<li>' . t('Access onde with this type and see new field with reference.') . '</li>';
+      $output .= '</ul>';
+      return $output;
+  }
+}
