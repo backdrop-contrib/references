@@ -94,12 +94,15 @@ function references_views_plugins() {
 }
 
 /**
- * Retrieves the list of views with a 'references' display, in a format suitable for a 'select' form element..
+ * Get Views Options.
  *
- * @param $entity_type
+ * Retrieves the list of views with a 'references' display, in a format suitable
+ * for a 'select' form element..
+ *
+ * @param string $entity_type
  *   The entity type.
  *
- * @return
+ * @return array
  *   An array of eligible views displays.
  */
 function references_get_views_options($entity_type) {
@@ -124,29 +127,32 @@ function references_get_views_options($entity_type) {
 /**
  * Retrieves an array of candidate referenceable entities, defined by a view.
  *
- * @param $entity_type
+ * @param string $entity_type
  *   The entity type.
- * @param $view_name
+ * @param string $view_name
  *   The name of the view.
- * @param $display_name
+ * @param string $display_name
  *   The name of the view's display. This has to be a 'References' display.
- * @param $args
+ * @param array $args
  *   The array of arguments ("contextual filters") for the view.
- * @param $options
+ * @param array $options
  *   Array of options to limit the scope of the returned list. This parameter
  *   is similar to the $options parameter for
  *   node_reference_potential_references(). An additional key is required:
  *   - title_field: the name of the column holding entities 'titles' within the
  *     entity base table.
  *
- * @return
+ * @return array
  *   An array of entities, in the format expected by
  *   node_reference_potential_references().
  *
  * @see node_reference_potential_references()
  * @see _node_reference_potential_references_views()
+ *
+ * @codingStandardsIgnoreStart
  */
 function references_potential_references_view($entity_type, $view_name, $display_name, $args, $options) {
+  // @codingStandardsIgnoreEnd
   $entity_info = entity_get_info($entity_type);
 
   // Check that the view is valid and the display still exists.
@@ -157,7 +163,7 @@ function references_potential_references_view($entity_type, $view_name, $display
 
   // If we have no access to the View an empty result should be returned to
   // avoid triggering the fallback results.
-  if  (!$view->access(array($display_name))) {
+  if (!$view->access(array($display_name))) {
     return array();
   }
 
@@ -169,13 +175,10 @@ function references_potential_references_view($entity_type, $view_name, $display
 
   $view->set_display($display_name);
 
-  /**
-   * @todo From merlinofchaos on IRC : arguments using summary view can defeat
-   * the style setting.
-   * We might also need to check if there's an argument, and set its
-   * style_plugin as well.
-   */
-
+  // @todo From merlinofchaos on IRC : arguments using summary view can defeat
+  // the style setting.
+  // We might also need to check if there's an argument, and set its
+  // style_plugin as well.
   // Set additional options to let references_plugin_display::query() narrow
   // the results.
   $references_options = array(
