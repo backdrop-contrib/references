@@ -807,7 +807,7 @@ function user_reference_potential_references($field, $options = array()) {
     'string' => '',
     'match' => 'contains',
     'ids' => array(),
-    'limit' => 0,
+    'limit' => 25,
   );
 
   $results = &drupal_static(__FUNCTION__, array());

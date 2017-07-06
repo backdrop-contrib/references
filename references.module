@@ -196,11 +196,7 @@ function references_potential_references_view($entity_type, $view_name, $display
     $view->add_item($display_name, 'field', $entity_info['base table'], $options['title_field'], $label_options);
   }
 
-  // Limit result set size.
-  $limit = !empty($options['limit']) ? $options['limit'] : 0;
-  $view->display_handler->set_option('pager', array('type' => 'some', 'options' => array('items_per_page' => $limit)));
-
-  // Make sure the query is not cached
+  // Make sure the query is not cached.
   $view->is_cacheable = FALSE;
 
   // Get the results.
