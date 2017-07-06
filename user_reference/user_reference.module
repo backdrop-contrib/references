@@ -417,12 +417,20 @@ function user_reference_field_formatter_view($entity_type, $entity, $field, $ins
           $label = entity_label('user', $user);
           if ($display['type'] == 'user_reference_default') {
             $uri = entity_uri('user', $user);
-            $result[$delta] = array(
-              '#type' => 'link',
-              '#title' => $label,
-              '#href' => $uri['path'],
-              '#options' => $uri['options'],
-            );
+            $router_item = menu_get_item($uri['path']);
+            if ($router_item && $router_item['access']) {
+              $result[$delta] = array(
+                '#type' => 'link',
+                '#title' => $label,
+                '#href' => $uri['path'],
+                '#options' => $uri['options'],
+              );
+            }
+            else {
+              $result[$delta] = array(
+                '#markup' => check_plain($label),
+              );
+            }
           }
           else {
             $result[$delta] = array(
