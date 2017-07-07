@@ -406,7 +406,7 @@ function node_reference_field_formatter_prepare_view($entity_type, $entities, $f
   foreach ($displays as $id => $display) {
     if ($display['type'] != 'node_reference_nid') {
       foreach ($items[$id] as $delta => $item) {
-        if ($item['access']) {
+        if (!empty($item['access'])) {
           $ids[$item['nid']] = $item['nid'];
         }
       }
@@ -418,7 +418,7 @@ function node_reference_field_formatter_prepare_view($entity_type, $entities, $f
   foreach ($displays as $id => $display) {
     if ($display['type'] != 'node_reference_nid') {
       foreach ($items[$id] as $delta => $item) {
-        if ($item['access']) {
+        if (!empty($item['access'])) {
           $items[$id][$delta]['node'] = $entities[$item['nid']];
         }
       }
@@ -437,7 +437,7 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
     case 'node_reference_default':
     case 'node_reference_plain':
       foreach ($items as $delta => $item) {
-        if ($item['access']) {
+        if (!empty($item['access'])) {
           $node = $item['node'];
           $label = entity_label('node', $node);
           if ($display['type'] == 'node_reference_default') {
@@ -487,7 +487,7 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
       // displayed, and which nodes will only be displayed as a title.
       $nodes_display = array();
       foreach ($items as $delta => $item) {
-        if ($item['access'] && !isset($recursion_queue[$item['nid']])) {
+        if (!empty($item['access']) && !isset($recursion_queue[$item['nid']])) {
           $nodes_display[$item['nid']] = $item['node'];
         }
       }
@@ -503,7 +503,7 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
 
       // Assemble the render array.
       foreach ($items as $delta => $item) {
-        if ($item['access']) {
+        if (!empty($item['access'])) {
           if (isset($nodes_display[$item['nid']])) {
             $result[$delta] = $nodes_built['nodes'][$item['nid']];
           }
@@ -528,7 +528,7 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
 
     case 'node_reference_nid':
       foreach ($items as $delta => $item) {
-        if ($item['access']) {
+        if (!empty($item['access'])) {
           $result[$delta] = array(
             '#markup' => $item['nid'],
           );
@@ -538,7 +538,7 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
 
     case 'node_reference_path':
       foreach ($items as $delta => $item) {
-        if ($item['access']) {
+        if (!empty($item['access'])) {
           $uri = entity_uri('node', $item['node']);
           $options = array(
             'absolute' => $settings['absolute'],
