@@ -234,9 +234,10 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
         ->condition('n.nid', $ids_to_check, 'IN');
 
       // Unless the user has the right permissions, restrict on the node status.
-      // (note: the 'view any unpublished content' permission is provided by the
-      // 'view_unpublished' contrib module.)
-      if (!user_access('bypass node access') && !user_access('view any unpublished content')) {
+      // 'view_unpublished' contrib module and the
+      // 'view all unpublished content'
+      // permission is provided by the 'workbench_moderation' contrib module.)
+      if (!user_access('bypass node access') && !user_access('view any unpublished content') && !user_access('view all unpublished content')) {
         // ... AND n.status = 1.
         $status_condition = db_or()
           ->condition('n.status', NODE_PUBLISHED);
