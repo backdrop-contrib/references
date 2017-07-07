@@ -438,7 +438,14 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
     case 'node_reference_plain':
       foreach ($items as $delta => $item) {
         if (!empty($item['access'])) {
-          $node = $item['node'];
+
+          if (!empty($item['node'])) {
+            $node = $item['node'];
+          }
+          else {
+            $node = node_load($item['nid']);
+          }
+
           $label = entity_label('node', $node);
           if ($display['type'] == 'node_reference_default') {
             $uri = entity_uri('node', $node);
@@ -488,7 +495,12 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
       $nodes_display = array();
       foreach ($items as $delta => $item) {
         if (!empty($item['access']) && !isset($recursion_queue[$item['nid']])) {
-          $nodes_display[$item['nid']] = $item['node'];
+          if (!empty($item['node'])) {
+            $nodes_display[$item['nid']] = $item['node'];
+          }
+          else {
+            $nodes_display[$item['nid']] = node_load($item['nid']);
+          }
         }
       }
 
