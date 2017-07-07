@@ -568,6 +568,7 @@ function node_reference_field_widget_info() {
       'field types' => array('node_reference'),
       'settings'    => array(
         'autocomplete_match' => 'contains',
+        'limit' => 10,
         'size' => 60,
         'autocomplete_path' => 'node_reference/autocomplete',
       ),
@@ -603,6 +604,25 @@ function node_reference_field_widget_settings_form($field, $instance) {
         'fuzzy'           => t('Fuzzy search'),
       ),
       '#description'      => t('Select the method used to collect autocomplete suggestions. Note that <em>Contains</em> can cause performance issues on sites with thousands of nodes.'),
+    );
+    $form['limit'] = array(
+      '#type'             => 'select',
+      '#title'            => t('Dropdown limit'),
+      '#options'          => drupal_map_assoc(array(
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+      )),
+      '#default_value'    => $settings['limit'],
+      '#required'         => TRUE,
+      '#description'      => t('Maximum number of matched dropdown items displayed on the form. Overrides limit setting of the view if used.'),
     );
     $form['size'] = array(
       '#type'             => 'textfield',
@@ -949,7 +969,7 @@ function node_reference_autocomplete($entity_type, $bundle, $field_name, $string
   $options = array(
     'string' => $string,
     'match' => $instance['widget']['settings']['autocomplete_match'],
-    'limit' => 10,
+    'limit' => $instance['widget']['settings']['limit'],
   );
   $references = node_reference_potential_references($field, $options);
 
