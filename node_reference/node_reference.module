@@ -1190,8 +1190,11 @@ function node_reference_field_views_data($field) {
   // No module_load_include(): this hook is invoked from
   // views/modules/field.views.inc, which is where that function is defined.
   $data = field_views_field_default_views_data($field);
+  $storage = array();
 
-  $storage = $field['storage']['details']['sql'];
+  if (isset($field['storage']['details']['sql'])) {
+    $storage = $field['storage']['details']['sql'];
+  }
 
   foreach ($storage as $table_data) {
     $table = key($table_data);
