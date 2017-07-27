@@ -887,8 +887,14 @@ function _user_reference_potential_references_views($field, $options) {
  * List of referenceable users defined by user role and status.
  */
 function _user_reference_potential_references_standard($field, $options) {
+
+  $filter_roles = array();
+
   // Avoid useless work.
-  $filter_roles = array_filter($field['settings']['referenceable_roles']);
+  if (is_array($field['settings']['referenceable_roles'])) {
+    $filter_roles = array_filter($field['settings']['referenceable_roles']);
+  }
+
   // $field['settings']['referenceable_status'] may be an int/boolean on D6
   // upgraded sites
   $filter_status = array();
