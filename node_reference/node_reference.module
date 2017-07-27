@@ -409,6 +409,7 @@ function node_reference_field_formatter_prepare_view($entity_type, $entities, $f
   foreach ($displays as $id => $display) {
     if ($display['type'] != 'node_reference_nid') {
       foreach ($items[$id] as $delta => $item) {
+        // Checking item 'access' before the use.
         if (!empty($item['access'])) {
           $ids[$item['nid']] = $item['nid'];
         }
@@ -421,6 +422,7 @@ function node_reference_field_formatter_prepare_view($entity_type, $entities, $f
   foreach ($displays as $id => $display) {
     if ($display['type'] != 'node_reference_nid') {
       foreach ($items[$id] as $delta => $item) {
+        // Checking item 'access' before the use.
         if (!empty($item['access'])) {
           $items[$id][$delta]['node'] = $entities[$item['nid']];
         }
