@@ -444,6 +444,7 @@ function node_reference_field_formatter_view($entity_type, $entity, $field, $ins
       foreach ($items as $delta => $item) {
         if (!empty($item['access'])) {
 
+          // Checking if exists the node. If not exists use node_load to load.
           if (!empty($item['node'])) {
             $node = $item['node'];
           }
