@@ -208,13 +208,15 @@ function node_reference_field_prepare_view($entity_type, $entities, $field, $ins
   // accessible by the current user).
   // Extract ids to check.
   $ids = array();
-  foreach ($items as $id => $entity_items) {
-    foreach ($entity_items as $delta => $item) {
-      if (is_array($item)) {
-        // Default to 'not accessible'.
-        $items[$id][$delta]['access'] = FALSE;
-        if (!empty($item['nid']) && is_numeric($item['nid'])) {
-          $ids[$item['nid']] = $item['nid'];
+  if (is_array($items)) {
+    foreach ($items as $id => $entity_items) {
+      foreach ($entity_items as $delta => $item) {
+        if (is_array($item)) {
+          // Default to 'not accessible'.
+          $items[$id][$delta]['access'] = FALSE;
+          if (!empty($item['nid']) && is_numeric($item['nid'])) {
+            $ids[$item['nid']] = $item['nid'];
+          }
         }
       }
     }
