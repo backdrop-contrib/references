@@ -10,7 +10,7 @@
  */
 function user_reference_devel_generate($object, $field, $instance, $bundle) {
   if (field_behaviors_widget('multiple values', $instance) == FIELD_BEHAVIOR_CUSTOM) {
-    return devel_generate_multiple('_user_reference_devel_generate', $object, $field);
+    return devel_generate_multiple('_user_reference_devel_generate', $object, $field, $instance, $bundle);
   }
   else {
     return _user_reference_devel_generate($object, $field);
