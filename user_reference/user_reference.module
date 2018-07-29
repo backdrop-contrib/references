@@ -896,7 +896,7 @@ function _user_reference_potential_references_standard($field, $options) {
   }
 
   // $field['settings']['referenceable_status'] may be an int/boolean on D6
-  // upgraded sites
+  // upgraded sites.
   $filter_status = array();
   if (is_array($field['settings']['referenceable_status'])) {
     // Selects only items in array that are not empty (true, 1, string, etc.)
