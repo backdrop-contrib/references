@@ -865,7 +865,7 @@ function _user_reference_potential_references_standard($field, $options) {
   // Skip filter when "authenticated user" choosen.
   if ($filter_roles && !isset($filter_roles[BACKDROP_AUTHENTICATED_ROLE])) {
     $query->join('users_roles', 'r', 'u.uid = r.uid');
-    $query->condition('r.rid', array_keys($filter_roles), 'IN');
+    $query->condition('r.role', array_keys($filter_roles), 'IN');
   }
 
   if ($options['string'] !== '') {
