@@ -684,7 +684,10 @@ function user_reference_field_widget_form(&$form, &$form_state, $field, $instanc
  *
  * @codingStandardsIgnoreStart
  */
-function user_reference_autocomplete_value($element, $input = FALSE, $form_state) {
+function user_reference_autocomplete_value($element, $input, $form_state) {
+  if (!isset($input)) {
+    $input = FALSE;
+  }
   // @codingStandardsIgnoreEnd
   if ($input === FALSE) {
     // We're building the displayed 'default value': expand the raw uid into
