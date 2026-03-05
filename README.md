@@ -1,6 +1,10 @@
 References
 ======================
 
+**NOTE: *Entity Reference* module is now in Backdrop core and largely replaces this module.
+In order use Entity Reference, using the [Entity Reference Migration](https://github.com/backdrop-contrib/entityreference_migration)
+can be helpful.**
+
 References project enables you to add node reference and user reference fields
 to your content types.
 
